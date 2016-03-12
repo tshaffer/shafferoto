@@ -6,6 +6,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+var fs = require("fs");
+
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
@@ -96,19 +98,19 @@ db.once('open', function() {
 
   var dateNow = Date.now();
 
-  photos.forEach(function(photo) {
-
-    var photoForDB = new Photo({
-      title: photo.title,
-      url: photo.url,
-      tags: [],
-      dateTaken: dateNow
-    });
-
-    photoForDB.save(function (err) {
-      if (err) return handleError(err);
-    })
-  });
+  //photos.forEach(function(photo) {
+  //
+  //  var photoForDB = new Photo({
+  //    title: photo.title,
+  //    url: photo.url,
+  //    tags: [],
+  //    dateTaken: dateNow
+  //  });
+  //
+  //  photoForDB.save(function (err) {
+  //    if (err) return handleError(err);
+  //  })
+  //});
 
   console.log("all photos saved");
 
@@ -116,10 +118,13 @@ db.once('open', function() {
 });
 
 // List all files in a directory in Node.js recursively in a synchronous fashion
+var readInProgress = false;
+
 function findPhotos(dir, photoFiles) {
   var fs = fs || require('fs');
   var files = fs.readdirSync(dir);
   photoFiles = photoFiles || [];
+
   files.forEach(function(file) {
     if (fs.statSync(dir + '/' + file).isDirectory()) {
       photoFiles = findPhotos(dir + '/' + file, photoFiles);
@@ -138,7 +143,28 @@ function findPhotos(dir, photoFiles) {
             base : file,
             ext : "." + suffix,
             name : "file"
-          })
+          });
+
+          if (!readInProgress) {
+
+            readInProgress = true;
+
+            console.log("read file at " + filePath);
+
+            var buffer=new Buffer(65535);
+            fs.open(filePath,'r',function(err,fd){
+              fs.read(fd, buffer, 0, buffer.length, 0, function(err, bytesRead, b)
+              {
+                console.log("read file at " + filePath);
+                if (err) throw err;
+                console.log("read successful");
+                var parser = require('exif-parser').create(b);
+                var result = parser.parse();
+                console.log(result);
+              });
+            })
+          }
+
           photo.url = filePath;
           photoFiles.push(photo);
         }
