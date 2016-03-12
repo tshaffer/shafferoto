@@ -1,11 +1,15 @@
+var photosDir = '/Users/tedshaffer/Documents/Miscellaneous/Personal/photos';
+
 var express = require('express');
 var mongoose = require('mongoose');
 
 console.log("launch shafferoto");
 
-console.log(__dirname);
+photoFileSuffixes = ['jpg'];
+
+console.log('Look for photos in ' + photosDir);
 var filelist = [];
-filelist = walkSync(__dirname, filelist);
+filelist = findPhotos(photosDir, filelist);
 
 var mongoose = require('mongoose');
 
@@ -115,17 +119,21 @@ module.exports = app;
 
 
 // List all files in a directory in Node.js recursively in a synchronous fashion
-//var walkSync = function(dir, filelist) {
-function walkSync(dir, filelist) {
-  var fs = fs || require('fs'),
-      files = fs.readdirSync(dir);
+function findPhotos(dir, filelist) {
+  var fs = fs || require('fs');
+  var files = fs.readdirSync(dir);
   filelist = filelist || [];
   files.forEach(function(file) {
     if (fs.statSync(dir + '/' + file).isDirectory()) {
       filelist = walkSync(dir + '/' + file, filelist);
     }
     else {
-      filelist.push(file);
+      // save it if it's a photo file
+      photoFileSuffixes.forEach(function(suffix) {
+        if (file.endsWith(suffix)) {
+          filelist.push(file);
+        }
+      });
     }
   });
   return filelist;
