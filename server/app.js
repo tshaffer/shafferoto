@@ -1,4 +1,53 @@
 var express = require('express');
+var mongoose = require('mongoose');
+
+console.log("launch shafferoto");
+
+var mongoose = require('mongoose');
+
+mongoose.connect('mongodb://localhost/shafferotoTest');
+
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log("connected to shafferotoTest");
+
+  var Schema = mongoose.Schema;
+
+  var photoSchema = new Schema({
+    title:  String,
+    url: String,
+    dateTaken: Date,
+    tags: [String],
+    comments: [{ body: String, date: Date }],
+  });
+
+  var Photo = mongoose.model('Photo', photoSchema);
+
+  var dateNow = Date.now();
+
+  var photo = new Photo({
+    title: 'First photo',
+    url: 'http://www.eatPizza.com/photo.jpg',
+    tags: ['Sam', 'Joel'],
+    dateTaken: dateNow
+  });
+
+  photo.save(function (err) {
+    if (err) return handleError(err);
+    console.log("photo saved");
+  })
+
+});
+
+function handleError(err) {
+  console.log("handleError invoked");
+  return;
+}
+
+return;
+
+
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
