@@ -1,60 +1,4 @@
-var photosDir = '/Users/tedshaffer/Documents/Miscellaneous/Personal/photos';
-
 var express = require('express');
-var mongoose = require('mongoose');
-
-console.log("launch shafferoto");
-
-photoFileSuffixes = ['jpg'];
-
-console.log('Look for photos in ' + photosDir);
-var filelist = [];
-filelist = findPhotos(photosDir, filelist);
-
-var mongoose = require('mongoose');
-
-mongoose.connect('mongodb://localhost/shafferotoTest');
-
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  console.log("connected to shafferotoTest");
-
-  var Schema = mongoose.Schema;
-
-  var photoSchema = new Schema({
-    title:  String,
-    url: String,
-    dateTaken: Date,
-    tags: [String],
-    comments: [{ body: String, date: Date }],
-  });
-
-  var Photo = mongoose.model('Photo', photoSchema);
-
-  var dateNow = Date.now();
-
-  var photo = new Photo({
-    title: 'First photo',
-    url: 'http://www.eatPizza.com/photo.jpg',
-    tags: ['Sam', 'Joel'],
-    dateTaken: dateNow
-  });
-
-  photo.save(function (err) {
-    if (err) return handleError(err);
-    console.log("photo saved");
-  })
-
-});
-
-function handleError(err) {
-  console.log("handleError invoked");
-  return;
-}
-
-return;
-
 
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -113,28 +57,102 @@ app.use(function(err, req, res, next) {
   });
 });
 
-console.log("launch shafferoto");
-
 module.exports = app;
 
+// after boilerplate code
+var mongoose = require('mongoose');
+
+console.log("launch shafferoto");
+
+mongoose.connect('mongodb://localhost/shafferotoTest');
+
+var app = express();
+module.exports = app;
+
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log("connected to shafferotoTest");
+
+  var Schema = mongoose.Schema;
+
+  var photoSchema = new Schema({
+    title:  String,
+    url: String,
+    dateTaken: Date,
+    tags: [String],
+    comments: [{ body: String, date: Date }],
+  });
+
+  var Photo = mongoose.model('Photo', photoSchema);
+
+  photoFileSuffixes = ['jpg'];
+
+  var photosDir = '/Users/tedshaffer/Documents/Miscellaneous/Personal/testPhotos';
+
+  console.log('Look for photos in ' + photosDir);
+  var photos = [];
+  photos = findPhotos(photosDir, photos);
+
+  var dateNow = Date.now();
+
+  photos.forEach(function(photo) {
+
+    var photoForDB = new Photo({
+      title: photo.title,
+      url: photo.url,
+      tags: [],
+      dateTaken: dateNow
+    });
+
+    photoForDB.save(function (err) {
+      if (err) return handleError(err);
+    })
+  });
+
+  console.log("all photos saved");
+
+  return;
+});
 
 // List all files in a directory in Node.js recursively in a synchronous fashion
-function findPhotos(dir, filelist) {
+function findPhotos(dir, photoFiles) {
   var fs = fs || require('fs');
   var files = fs.readdirSync(dir);
-  filelist = filelist || [];
+  photoFiles = photoFiles || [];
   files.forEach(function(file) {
     if (fs.statSync(dir + '/' + file).isDirectory()) {
-      filelist = walkSync(dir + '/' + file, filelist);
+      photoFiles = findPhotos(dir + '/' + file, photoFiles);
     }
     else {
       // save it if it's a photo file
       photoFileSuffixes.forEach(function(suffix) {
-        if (file.endsWith(suffix)) {
-          filelist.push(file);
+        if (file.toLowerCase().endsWith(suffix)) {
+
+          photo = {};
+          photo.title = file;
+
+          var filePath = path.format({
+            root : "/",
+            dir : dir,
+            base : file,
+            ext : "." + suffix,
+            name : "file"
+          })
+          photo.url = filePath;
+          photoFiles.push(photo);
         }
       });
     }
   });
-  return filelist;
+  return photoFiles;
 };
+
+function handleError(err) {
+  console.log("handleError invoked");
+  return;
+}
+
+
+
+
