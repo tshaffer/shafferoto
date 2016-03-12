@@ -3,6 +3,10 @@ var mongoose = require('mongoose');
 
 console.log("launch shafferoto");
 
+console.log(__dirname);
+var filelist = [];
+filelist = walkSync(__dirname, filelist);
+
 var mongoose = require('mongoose');
 
 mongoose.connect('mongodb://localhost/shafferotoTest');
@@ -108,3 +112,21 @@ app.use(function(err, req, res, next) {
 console.log("launch shafferoto");
 
 module.exports = app;
+
+
+// List all files in a directory in Node.js recursively in a synchronous fashion
+//var walkSync = function(dir, filelist) {
+function walkSync(dir, filelist) {
+  var fs = fs || require('fs'),
+      files = fs.readdirSync(dir);
+  filelist = filelist || [];
+  files.forEach(function(file) {
+    if (fs.statSync(dir + '/' + file).isDirectory()) {
+      filelist = walkSync(dir + '/' + file, filelist);
+    }
+    else {
+      filelist.push(file);
+    }
+  });
+  return filelist;
+};
