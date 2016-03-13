@@ -5,4 +5,5 @@ server/views
 server/bin
 angularClient/bower_components
 angularClient/.idea
+angularClient/img
 
