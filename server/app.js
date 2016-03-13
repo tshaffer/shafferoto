@@ -1,3 +1,5 @@
+var photosDir = '/Users/tedshaffer/Documents/Projects/shafferoto/server/public';
+
 var express = require('express');
 //var request = require('request');
 var path = require('path');
@@ -9,7 +11,7 @@ var ExifImage = require('exif').ExifImage;
 
 var app = express();
 
-app.use('/assets', express.static(path.join(__dirname,'/public')));
+app.use('/photos', express.static(path.join(__dirname,'/public')));
 app.use(bodyParser.json());
 //app.use(express.static(path.join(__dirname, 'public')));
 
@@ -45,7 +47,6 @@ var photoSchema = new Schema({
 
 var Photo = mongoose.model('Photo', photoSchema);
 var photoFileSuffixes = ['jpg'];
-var photosDir = '/Users/tedshaffer/Documents/Miscellaneous/Personal/testPhotos';
 
 mongoose.connect('mongodb://localhost/shafferotoTest');
 
@@ -88,7 +89,7 @@ function findPhotos(dir, photoFiles) {
             ext : "." + suffix,
             name : "file"
           });
-          photo.url = filePath;
+          photo.url = path.relative(photosDir, filePath);
           photo.dateTaken = Date.now();
           photo.orientation = 1;
 

@@ -14,6 +14,10 @@ angular.module('shafferoto').service('myServerService', ['$http', function($http
         this.baseUrl = document.baseURI.substr(0, document.baseURI.lastIndexOf(":")) + ":8080/";
     }
 
+    this.getBaseUrl = function() {
+        return this.baseUrl;
+    };
+
     this.getPhotos = function() {
 
         var url = self.baseUrl + "getPhotos";

@@ -8,8 +8,11 @@ shafferoto.controller('ShafferotoController', ['$scope', '$http', 'myServerServi
     getPhotosPromise.then(function (result) {
         console.log("getPhotos successful");
 
+        var baseUrl = $myServerService.getBaseUrl() +  "photos/";
+
         result.data.photos.forEach(function(photo){
-            $scope.images.push( { src: photo.url, title: photo.title } );
+            var url = baseUrl + photo.url;
+            $scope.images.push( { src: url, title: photo.title } );
         });
 
     })
