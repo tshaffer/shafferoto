@@ -1,7 +1,7 @@
 /**
  * Created by tedshaffer on 3/13/16.
  */
-angular.module('shafferoto').service('myServerService', ['$http', function($http) {
+angular.module('shafferoto').service('shafferotoServerService', ['$http', function($http) {
 
     var self = this;
 

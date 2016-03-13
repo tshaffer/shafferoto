@@ -1,14 +1,14 @@
 var shafferoto=angular.module('shafferoto',['ngAnimate']);
 
-shafferoto.controller('ShafferotoController', ['$scope', '$http', 'myServerService', function($scope, $http, $myServerService) {
+shafferoto.controller('ShafferotoController', ['$scope', '$http', 'shafferotoServerService', function($scope, $http, $shafferotoServerService) {
 
     $scope.images = [];
 
-    var getPhotosPromise = $myServerService.getPhotos();
+    var getPhotosPromise = $shafferotoServerService.getPhotos();
     getPhotosPromise.then(function (result) {
         console.log("getPhotos successful");
 
-        var baseUrl = $myServerService.getBaseUrl() +  "photos/";
+        var baseUrl = $shafferotoServerService.getBaseUrl() +  "photos/";
 
         result.data.photos.forEach(function(photo){
             var url = baseUrl + photo.url;
