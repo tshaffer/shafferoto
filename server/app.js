@@ -17,10 +17,35 @@ app.get('/', function(req, res) {
   res.send('<html><head></head><body><h1>Hello shafferoto!</h1></body></html>');
 });
 
-// after boilerplate code
-var mongoose = require('mongoose');
+app.get('/getPhotos', function(req, res) {
+
+  console.log("getPhotos invoked");
+  res.set('Access-Control-Allow-Origin', '*');
+
+  var response = {};
+  response.photos = photos;
+  res.send(response);
+
+});
+
+var photos = [];
 
 console.log("launch shafferoto");
+
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+var photoSchema = new Schema({
+  title:  String,
+  url: String,
+  dateTaken: Date,
+  orientation: Number,
+  tags: [String],
+  comments: [{ body: String, date: Date }],
+});
+
+var Photo = mongoose.model('Photo', photoSchema);
+var photoFileSuffixes = ['jpg'];
+var photosDir = '/Users/tedshaffer/Documents/Miscellaneous/Personal/testPhotos';
 
 mongoose.connect('mongodb://localhost/shafferotoTest');
 
@@ -29,31 +54,13 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
   console.log("connected to shafferotoTest");
 
-  var Schema = mongoose.Schema;
-
-  var photoSchema = new Schema({
-    title:  String,
-    url: String,
-    dateTaken: Date,
-    tags: [String],
-    comments: [{ body: String, date: Date }],
-  });
-
-  Photo = mongoose.model('Photo', photoSchema);
-
-  photoFileSuffixes = ['jpg'];
-
-  var photosDir = '/Users/tedshaffer/Documents/Miscellaneous/Personal/testPhotos';
 
   console.log('Look for photos in ' + photosDir);
-  var photos = [];
   photos = findPhotos(photosDir, photos);
 
   if (photos.length > 0) {
     getExifData(photos, 0);
   }
-
-  return;
 });
 
 
@@ -83,6 +90,7 @@ function findPhotos(dir, photoFiles) {
           });
           photo.url = filePath;
           photo.dateTaken = Date.now();
+          photo.orientation = 1;
 
           photoFiles.push(photo);
         }
@@ -109,19 +117,30 @@ function getExifData(photos, photoIndex) {
           console.log('Error: '+ error.message);
         }
         else {
-          console.log("return from invoke exifImage");
+          //console.log("return from invoke exifImage");
 
           var dateTaken;
           if (typeof exifData.exif.DateTimeOriginal == 'undefined') {
-            console.log("exif date data undefined for " + filePath);
+            //console.log("exif date data undefined for " + filePath);
             dateTaken = Date.now();
           }
           else
           {
-            console.log(exifData.exif.DateTimeOriginal);
+            //console.log(exifData.exif.DateTimeOriginal);
             dateTaken = parseDate(exifData.exif.DateTimeOriginal);
           }
           photo.dateTaken = dateTaken;
+
+          //console.log("typeof exifData.image.Orientation=" + (typeof exifData.image.Orientation).toString());
+
+          var orientation;
+          if (typeof exifData.image.Orientation == 'undefined') {
+            orientation = 1;
+          }
+          else {
+            orientation = exifData.image.Orientation;
+          }
+          photo.orientation = orientation;
 
           photoIndex++;
           getExifData(photos, photoIndex);
@@ -148,7 +167,8 @@ function savePhotosToDB(photos) {
       title: photo.title,
       url: photo.url,
       tags: [],
-      dateTaken: photo.dateTaken
+      dateTaken: photo.dateTaken,
+      orientation: photo.orientation
     });
 
     photoForDB.save(function (err) {
