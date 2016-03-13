@@ -3,8 +3,6 @@ server/.idea
 server/routes
 server/views
 server/bin
-angularClient/e2e-tests
-angularClient/karma.conf.js
-angularClient/LICENSE
-angularClient/README.md
+angularClient/bower_components
+angularClient/.idea
 
