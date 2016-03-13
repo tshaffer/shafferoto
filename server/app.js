@@ -98,19 +98,19 @@ db.once('open', function() {
 
   var dateNow = Date.now();
 
-  //photos.forEach(function(photo) {
-  //
-  //  var photoForDB = new Photo({
-  //    title: photo.title,
-  //    url: photo.url,
-  //    tags: [],
-  //    dateTaken: dateNow
-  //  });
-  //
-  //  photoForDB.save(function (err) {
-  //    if (err) return handleError(err);
-  //  })
-  //});
+  photos.forEach(function(photo) {
+
+    var photoForDB = new Photo({
+      title: photo.title,
+      url: photo.url,
+      tags: [],
+      dateTaken: photo.dateTaken
+    });
+
+    photoForDB.save(function (err) {
+      if (err) return handleError(err);
+    })
+  });
 
   console.log("all photos saved");
 
@@ -119,6 +119,7 @@ db.once('open', function() {
 
 // List all files in a directory in Node.js recursively in a synchronous fashion
 var readInProgress = false;
+var ExifImage = require('exif').ExifImage;
 
 function findPhotos(dir, photoFiles) {
   var fs = fs || require('fs');
@@ -134,7 +135,7 @@ function findPhotos(dir, photoFiles) {
       photoFileSuffixes.forEach(function(suffix) {
         if (file.toLowerCase().endsWith(suffix)) {
 
-          photo = {};
+          var photo = {};
           photo.title = file;
 
           var filePath = path.format({
@@ -144,28 +145,41 @@ function findPhotos(dir, photoFiles) {
             ext : "." + suffix,
             name : "file"
           });
+          photo.url = filePath;
+          photo.dateTaken = Date.now();
+
+          console.log("almost invoke exifImage");
 
           if (!readInProgress) {
-
             readInProgress = true;
+            try {
+              console.log("invoke exifImage");
+              new ExifImage({ image : filePath }, function (error, exifData) {
+                if (error) {
+                  console.log("error returned from ExifImage");
+                  console.log('Error: '+ error.message);
+                }
+                else {
+                  console.log(exifData.exif.DateTimeOriginal);
+                  var dto = exifData.exif.DateTimeOriginal;
+                  var dateTaken = new Date();
+                  // date format looks like: 2014:03:23 14:47:32
+                  dateTaken.setFullYear(Number(dto.substring(0,4)));
+                  dateTaken.setMonth(Number(dto.substring(5, 7)) - 1);
+                  dateTaken.setDate(Number(dto.substring(8, 10)));
+                  dateTaken.setHours(Number(dto.substring(11, 13)));
+                  dateTaken.setMinutes(Number(dto.substring(14, 16)));
+                  dateTaken.setSeconds(Number(dto.substring(17, 19)));
+                  console.log(dateTaken.toString());
 
-            console.log("read file at " + filePath);
-
-            var buffer=new Buffer(65535);
-            fs.open(filePath,'r',function(err,fd){
-              fs.read(fd, buffer, 0, buffer.length, 0, function(err, bytesRead, b)
-              {
-                console.log("read file at " + filePath);
-                if (err) throw err;
-                console.log("read successful");
-                var parser = require('exif-parser').create(b);
-                var result = parser.parse();
-                console.log(result);
+                  photo.dateTaken = dateTaken;
+                }
               });
-            })
+            } catch (error) {
+              console.log('Error: ' + error.message);
+            }
           }
 
-          photo.url = filePath;
           photoFiles.push(photo);
         }
       });
