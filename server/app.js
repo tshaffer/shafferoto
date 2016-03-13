@@ -8,6 +8,9 @@ var bodyParser = require('body-parser');
 
 var fs = require("fs");
 
+//https://github.com/gomfunkel/node-exif
+var ExifImage = require('exif').ExifImage;
+
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
@@ -86,7 +89,7 @@ db.once('open', function() {
     comments: [{ body: String, date: Date }],
   });
 
-  var Photo = mongoose.model('Photo', photoSchema);
+  Photo = mongoose.model('Photo', photoSchema);
 
   photoFileSuffixes = ['jpg'];
 
@@ -96,30 +99,13 @@ db.once('open', function() {
   var photos = [];
   photos = findPhotos(photosDir, photos);
 
-  var dateNow = Date.now();
-
-  photos.forEach(function(photo) {
-
-    var photoForDB = new Photo({
-      title: photo.title,
-      url: photo.url,
-      tags: [],
-      dateTaken: photo.dateTaken
-    });
-
-    photoForDB.save(function (err) {
-      if (err) return handleError(err);
-    })
-  });
-
-  console.log("all photos saved");
+  if (photos.length > 0) {
+    getExifData(photos, 0);
+  }
 
   return;
 });
 
-// List all files in a directory in Node.js recursively in a synchronous fashion
-var readInProgress = false;
-var ExifImage = require('exif').ExifImage;
 
 function findPhotos(dir, photoFiles) {
   var fs = fs || require('fs');
@@ -148,38 +134,6 @@ function findPhotos(dir, photoFiles) {
           photo.url = filePath;
           photo.dateTaken = Date.now();
 
-          console.log("almost invoke exifImage");
-
-          if (!readInProgress) {
-            readInProgress = true;
-            try {
-              console.log("invoke exifImage");
-              new ExifImage({ image : filePath }, function (error, exifData) {
-                if (error) {
-                  console.log("error returned from ExifImage");
-                  console.log('Error: '+ error.message);
-                }
-                else {
-                  console.log(exifData.exif.DateTimeOriginal);
-                  var dto = exifData.exif.DateTimeOriginal;
-                  var dateTaken = new Date();
-                  // date format looks like: 2014:03:23 14:47:32
-                  dateTaken.setFullYear(Number(dto.substring(0,4)));
-                  dateTaken.setMonth(Number(dto.substring(5, 7)) - 1);
-                  dateTaken.setDate(Number(dto.substring(8, 10)));
-                  dateTaken.setHours(Number(dto.substring(11, 13)));
-                  dateTaken.setMinutes(Number(dto.substring(14, 16)));
-                  dateTaken.setSeconds(Number(dto.substring(17, 19)));
-                  console.log(dateTaken.toString());
-
-                  photo.dateTaken = dateTaken;
-                }
-              });
-            } catch (error) {
-              console.log('Error: ' + error.message);
-            }
-          }
-
           photoFiles.push(photo);
         }
       });
@@ -188,11 +142,90 @@ function findPhotos(dir, photoFiles) {
   return photoFiles;
 };
 
+
+function getExifData(photos, photoIndex) {
+
+  console.log("getExifData invoked with photoIndex = " + photoIndex);
+
+  if (photoIndex < photos.length) {
+    var photo = photos[photoIndex];
+    var filePath = photo.url;
+
+    try {
+      console.log("invoke exifImage");
+      new ExifImage({ image : filePath }, function (error, exifData) {
+        if (error) {
+          console.log("error returned from ExifImage");
+          console.log('Error: '+ error.message);
+        }
+        else {
+          console.log("return from invoke exifImage");
+
+          var dateTaken;
+          if (typeof exifData.exif.DateTimeOriginal == 'undefined') {
+            console.log("exif date data undefined for " + filePath);
+            dateTaken = Date.now();
+          }
+          else
+          {
+            console.log(exifData.exif.DateTimeOriginal);
+            dateTaken = parseDate(exifData.exif.DateTimeOriginal);
+          }
+          photo.dateTaken = dateTaken;
+
+          photoIndex++;
+          getExifData(photos, photoIndex);
+        }
+      });
+    } catch (error) {
+      console.log('Error: ' + error.message);
+    }
+  }
+  else {
+    console.log("exif retrieved for all photos");
+    savePhotosToDB(photos);
+  }
+}
+
+
+function savePhotosToDB(photos) {
+
+  photos.forEach(function(photo) {
+
+    var photoForDB = new Photo({
+      title: photo.title,
+      url: photo.url,
+      tags: [],
+      dateTaken: photo.dateTaken
+    });
+
+    photoForDB.save(function (err) {
+      if (err) return handleError(err);
+    });
+  });
+
+  console.log("all photos submitted to save engine");
+}
+
+
+function parseDate(dateIn) {
+
+  // date input format looks like:
+  //    2014:03:23 14:47:32
+
+  var dateOut = new Date();
+  dateOut.setFullYear(Number(dateIn.substring(0,4)));
+  dateOut.setMonth(Number(dateIn.substring(5, 7)) - 1);
+  dateOut.setDate(Number(dateIn.substring(8, 10)));
+  dateOut.setHours(Number(dateIn.substring(11, 13)));
+  dateOut.setMinutes(Number(dateIn.substring(14, 16)));
+  dateOut.setSeconds(Number(dateIn.substring(17, 19)));
+  console.log(dateOut.toString());
+  return dateOut;
+}
+
+
 function handleError(err) {
   console.log("handleError invoked");
   return;
 }
-
-
-
-
