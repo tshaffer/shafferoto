@@ -1,3 +1,7 @@
+.rotate90 {
+	-webkit-transform: rotate(90deg);
+}
+
 *{
 font-family: 'Open Sans', sans-serif;
 }

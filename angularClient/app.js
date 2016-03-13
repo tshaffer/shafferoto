@@ -12,7 +12,7 @@ shafferoto.controller('ShafferotoController', ['$scope', '$http', 'shafferotoSer
 
         result.data.photos.forEach(function(photo){
             var url = baseUrl + photo.url;
-            $scope.images.push( { src: url, title: photo.title } );
+            $scope.images.push( { src: url, title: photo.title, orientation: photo.orientation } );
         });
 
     })

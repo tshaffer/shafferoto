@@ -90,6 +90,7 @@ function findPhotos(dir, photoFiles) {
             name : "file"
           });
           photo.url = path.relative(photosDir, filePath);
+          photo.filePath = filePath;
           photo.dateTaken = Date.now();
           photo.orientation = 1;
 
@@ -108,10 +109,10 @@ function getExifData(photos, photoIndex) {
 
   if (photoIndex < photos.length) {
     var photo = photos[photoIndex];
-    var filePath = photo.url;
+    var filePath = photo.filePath;
 
     try {
-      console.log("invoke exifImage");
+      console.log("invoke exifImage for the file at: " + filePath);
       new ExifImage({ image : filePath }, function (error, exifData) {
         if (error) {
           console.log("error returned from ExifImage");
