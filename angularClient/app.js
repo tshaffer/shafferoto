@@ -1,15 +1,25 @@
-/**
- * Created by tedshaffer on 3/13/16.
- */
 var shafferoto=angular.module('shafferoto',['ngAnimate']);
 
-shafferoto.controller('ShafferotoController', function($scope) {
-    var baseDir = 'http://localhost:3000/assets/';
-    var picture1 = baseDir + "IMG_1624.JPG";
-    var picture2 = baseDir + 'IMG_1625.JPG';
-    $scope.images = [ { src: picture1, title: 'Picture 1'}, { src: picture2, title: 'Picture 2'}];
+shafferoto.controller('ShafferotoController', ['$scope', '$http', 'myServerService', function($scope, $http, $myServerService) {
+
+    $scope.images = [];
+
+    var getPhotosPromise = $myServerService.getPhotos();
+    getPhotosPromise.then(function (result) {
+        console.log("getPhotos successful");
+
+        result.data.photos.forEach(function(photo){
+            $scope.images.push( { src: photo.url, title: photo.title } );
+        });
+
+    })
+
+    //var baseDir = 'http://localhost:3000/assets/';
+    //var picture1 = baseDir + "IMG_1624.JPG";
+    //var picture2 = baseDir + 'IMG_1625.JPG';
+    //$scope.images = [ { src: picture1, title: 'Picture 1'}, { src: picture2, title: 'Picture 2'}];
     //$scope.images=[{src:'img1.png',title:'Pic 1'},{src:'img2.jpg',title:'Pic 2'},{src:'img3.jpg',title:'Pic 3'},{src:'img4.png',title:'Pic 4'},{src:'img5.png',title:'Pic 5'}];
-});
+}]);
 
 shafferoto.directive('slider', function ($timeout) {
     return {
