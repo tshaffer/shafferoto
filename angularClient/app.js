@@ -4,11 +4,11 @@
 var shafferoto=angular.module('shafferoto',['ngAnimate']);
 
 shafferoto.controller('ShafferotoController', function($scope) {
-    //var baseDir = 'file://Users/tedshaffer/Documents/Miscellaneous/Personal/testPhotos/New Orleans/';
-    //var picture1 = baseDir + 'IMG_1624.JPG';
-    //var picture2 = baseDir + 'IMG_1625.JPG';
-    //$scope.images = [ { src: picture1, title: 'Picture 1'}, { src: picture2, title: 'Picture 2'}];
-    $scope.images=[{src:'img1.png',title:'Pic 1'},{src:'img2.jpg',title:'Pic 2'},{src:'img3.jpg',title:'Pic 3'},{src:'img4.png',title:'Pic 4'},{src:'img5.png',title:'Pic 5'}];
+    var baseDir = 'http://localhost:3000/assets/';
+    var picture1 = baseDir + "IMG_1624.JPG";
+    var picture2 = baseDir + 'IMG_1625.JPG';
+    $scope.images = [ { src: picture1, title: 'Picture 1'}, { src: picture2, title: 'Picture 2'}];
+    //$scope.images=[{src:'img1.png',title:'Pic 1'},{src:'img2.jpg',title:'Pic 2'},{src:'img3.jpg',title:'Pic 3'},{src:'img4.png',title:'Pic 4'},{src:'img5.png',title:'Pic 5'}];
 });
 
 shafferoto.directive('slider', function ($timeout) {
@@ -44,8 +44,8 @@ shafferoto.directive('slider', function ($timeout) {
             var sliderFunc=function(){
                 timer=$timeout(function(){
                     scope.next();
-                    timer=$timeout(sliderFunc,5000);
-                },5000);
+                    timer=$timeout(sliderFunc,15000);
+                },15000);
             };
 
             sliderFunc();
