@@ -1,8 +1,6 @@
 server/node_modules
 server/.idea
-server/routes
-server/views
-server/bin
+server/public
 angularClient/bower_components
 angularClient/.idea
 angularClient/img
