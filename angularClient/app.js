@@ -14,6 +14,8 @@ shafferoto.controller('ShafferotoController', ['$scope', '$http', 'shafferotoSer
             var url = baseUrl + photo.url;
             $scope.images.push( { src: url, title: photo.title, orientation: photo.orientation } );
         });
+
+        $scope.$broadcast("imagesInitialized");
     })
 }]);
 
@@ -36,16 +38,21 @@ shafferoto.directive('slider', function ($timeout) {
                 scope.currentIndex>0?scope.currentIndex--:scope.currentIndex=scope.images.length-1;
             };
 
+            scope.setVisiblePhoto = function() {
+                if (typeof scope.images[scope.currentIndex] != 'undefined') {
+                    scope.images[scope.currentIndex].visible = true;
+                }
+            };
+
             scope.$watch('currentIndex',function(){
                 scope.images.forEach(function(image){
                     image.visible=false;
                 });
-                if (typeof scope.images[scope.currentIndex] != 'undefined') {
-                    scope.images[scope.currentIndex].visible = true;
-                }
-                else {
-                    console.log("images undefined");
-                }
+                scope.setVisiblePhoto();
+            });
+
+            scope.$on("imagesInitialized", function (event, args) {
+                scope.setVisiblePhoto();
             });
 
             /* Start: For Automatic slideshow*/
