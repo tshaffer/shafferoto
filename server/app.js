@@ -11,13 +11,15 @@ var ExifImage = require('exif').ExifImage;
 
 var app = express();
 
-app.use('/photos', express.static(path.join(__dirname,'/public')));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 //app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', function(req, res) {
   res.send('<html><head></head><body><h1>Hello shafferoto!</h1></body></html>');
 });
+
+app.use('/photos', express.static(path.join(__dirname,'/public')));
 
 app.get('/getPhotos', function(req, res) {
 
@@ -28,6 +30,13 @@ app.get('/getPhotos', function(req, res) {
   response.photos = photos;
   res.send(response);
 
+});
+
+app.get('/getTaggedPhotos', function(req, res) {
+  console.log("specified tag is " + req.query.tag);
+
+  var response = '<html><head></head><body><h1>tag is ' + req.query.tag + '</h1></body></html>';
+  res.send(response);
 });
 
 var photos = [];
@@ -55,6 +64,22 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
   console.log("connected to shafferotoTest");
 
+  // retrieve photos that are already in the database
+
+  // find all photos
+  //Photo.find({}, function(err, photoDocs) {
+  Photo.find( { tags: { $in: ["drinks"] } }, function(err, photoDocs) {
+    if (err) {
+      console.log("error returned from mongoose query");
+      return;
+    }
+
+    photoDocs.forEach(function(photoDoc) {
+      photos.push( { title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation });
+    });
+  });
+
+  return;
 
   console.log('Look for photos in ' + photosDir);
   photos = findPhotos(photosDir, photos);
@@ -160,8 +185,6 @@ function getExifData(photos, photoIndex) {
 
 
 function savePhotosToDB(photos) {
-
-  return;
 
   photos.forEach(function(photo) {
 
