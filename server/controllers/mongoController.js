@@ -1,3 +1,5 @@
+var dbOpened = false;
+
 var mongoose = require('mongoose');
 
 var photos = [];
@@ -22,23 +24,7 @@ function initializeMongo() {
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function() {
         console.log("connected to shafferotoTest");
-
-        // retrieve photos that are already in the database
-
-        // find all photos
-        Photo.find({}, function(err, photoDocs) {
-            //Photo.find( { tags: { $in: ["drinks"] } }, function(err, photoDocs) {
-            if (err) {
-                console.log("error returned from mongoose query");
-                return;
-            }
-
-            photoDocs.forEach(function(photoDoc) {
-                photos.push( { title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation });
-            });
-        });
-
-        return;
+        dbOpened = true;
 
         //console.log('Look for photos in ' + photosDir);
         //photos = findPhotos(photosDir, photos);
@@ -48,6 +34,35 @@ function initializeMongo() {
         //}
     });
 }
+
+
+function fetchAllPhotos() {
+
+    return new Promise(function (resolve, reject) {
+
+        if (dbOpened) {
+
+            //Photo.find( { tags: { $in: ["drinks"] } }, function(err, photoDocs) {
+            Photo.find({}, function (err, photoDocs) {
+                if (err) {
+                    console.log("error returned from mongoose query");
+                    reject();
+                }
+
+                photoDocs.forEach(function (photoDoc) {
+                    photos.push({title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation});
+                });
+
+                resolve(photos);
+            });
+        }
+        else {
+            reject();
+        }
+    });
+
+}
+
 
 function savePhotosToDB(photos) {
 
@@ -75,5 +90,6 @@ function handleError(err) {
 }
 
 module.exports = {
-    initializeMongo: initializeMongo
+    initializeMongo: initializeMongo,
+    fetchAllPhotos: fetchAllPhotos
 }

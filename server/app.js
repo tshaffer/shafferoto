@@ -29,9 +29,12 @@ app.get('/getPhotos', function(req, res) {
   console.log("getPhotos invoked");
   res.set('Access-Control-Allow-Origin', '*');
 
-  var response = {};
-  response.photos = photos;
-  res.send(response);
+  var fetchAllPhotosPromise = mongoController.fetchAllPhotos();
+  fetchAllPhotosPromise.then(function(allPhotos) {
+    var response = {};
+    response.photos = allPhotos;
+    res.send(response);
+  });
 
 });
 
