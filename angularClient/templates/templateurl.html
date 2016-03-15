@@ -2,7 +2,7 @@
 	<div class="slide" ng-repeat="image in images" ng-show="image.visible">
 		<div style="position:fixed; height: 100%; width: 100%; top:0;left: 0;">
 			<p>{{image.title}}</p>
-			<img ng-src="{{image.src}}" style="height: 100%;" ng-class="{rotate90: image.orientation==6}" />
+			<img ng-src="{{image.src}}" style="height: 100%;" ng-class="{ rotate90: image.orientation==6, rotate180: image.orientation==3 }" />
 		</div>
 	</div>
 	<div class="arrows">

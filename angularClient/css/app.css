@@ -2,6 +2,10 @@
 	-webkit-transform: rotate(90deg);
 }
 
+.rotate180 {
+	-webkit-transform: rotate(180deg);
+}
+
 *{
 font-family: 'Open Sans', sans-serif;
 }

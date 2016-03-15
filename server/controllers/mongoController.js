@@ -64,6 +64,34 @@ function fetchAllPhotos() {
 }
 
 
+function hashAllPhotos() {
+
+    return new Promise(function (resolve, reject) {
+
+        if (dbOpened) {
+
+            //Photo.find( { tags: { $in: ["drinks"] } }, function(err, photoDocs) {
+            Photo.find({}, function (err, photoDocs) {
+                if (err) {
+                    console.log("error returned from mongoose query");
+                    reject();
+                }
+
+                var hashedPhotos = {};
+                photoDocs.forEach(function (photoDoc) {
+                    hashedPhotos[photoDoc.url] = true;
+                });
+
+                resolve(hashedPhotos);
+            });
+        }
+        else {
+            reject();
+        }
+    });
+}
+
+
 function savePhotosToDB(photos) {
 
     photos.forEach(function(photo) {
@@ -91,5 +119,7 @@ function handleError(err) {
 
 module.exports = {
     initializeMongo: initializeMongo,
-    fetchAllPhotos: fetchAllPhotos
+    fetchAllPhotos: fetchAllPhotos,
+    hashAllPhotos: hashAllPhotos,
+    savePhotosToDB: savePhotosToDB
 }

@@ -1,7 +1,6 @@
 var photosDir = '/Users/tedshaffer/Documents/Projects/shafferoto/server/public';
 
 var express = require('express');
-//var request = require('request');
 var path = require('path');
 var bodyParser = require('body-parser');
 var fs = require("fs");
@@ -38,6 +37,39 @@ app.get('/getPhotos', function(req, res) {
 
 });
 
+app.get('/updateDB', function(req, res) {
+
+  console.log("updateDB invoked");
+  res.set('Access-Control-Allow-Origin', '*');
+
+  // retrieve photos that exist in db; get them in a hash table
+  var hashAllPhotosPromise = mongoController.hashAllPhotos();
+  hashAllPhotosPromise.then(function(photosInDB) {
+
+    console.log('Look for photos in ' + photosDir);
+    var photosOnDrive = [];
+    photosOnDrive = findPhotos(photosDir, photosOnDrive);
+
+    if (photosOnDrive.length > 0) {
+
+      // look for photosOnDrive that aren't in photosInDB
+      var photosToAdd = [];
+      photosOnDrive.forEach(function (photoOnDrive) {
+        if ( !photosInDB.hasOwnProperty( photoOnDrive.url ) ) {
+          photosToAdd.push(photoOnDrive);
+        }
+      });
+
+      if (photosToAdd.length > 0) {
+        getExifData(photosToAdd, 0);
+      }
+    }
+
+    res.send("ok");
+  });
+
+});
+
 app.get('/getTaggedPhotos', function(req, res) {
   console.log("specified tag is " + req.query.tag);
 
@@ -52,7 +84,6 @@ console.log("launch shafferoto");
 var photoFileSuffixes = ['jpg'];
 
 function findPhotos(dir, photoFiles) {
-  var fs = fs || require('fs');
   var files = fs.readdirSync(dir);
   photoFiles = photoFiles || [];
 
@@ -101,6 +132,7 @@ function getExifData(photos, photoIndex) {
       console.log("invoke exifImage for the file at: " + filePath);
       new ExifImage({ image : filePath }, function (error, exifData) {
         if (error) {
+          //TODO need to continue on when this happens - this will definitely happen as I have photos with no exif data
           console.log("error returned from ExifImage");
           console.log('Error: '+ error.message);
         }
@@ -140,7 +172,7 @@ function getExifData(photos, photoIndex) {
   }
   else {
     console.log("exif retrieved for all photos");
-    savePhotosToDB(photos);
+    mongoController.savePhotosToDB(photos);
   }
 }
 
