@@ -61,7 +61,10 @@ app.get('/updateDB', function(req, res) {
       });
 
       if (photosToAdd.length > 0) {
-        getExifData(photosToAdd, 0);
+        var getExifDataPromise = getAllExifData(photosToAdd);
+        getExifDataPromise.then(function(photos) {
+          //mongoController.savePhotosToDB(photos);
+        });
       }
     }
 
@@ -119,13 +122,33 @@ function findPhotos(dir, photoFiles) {
   return photoFiles;
 };
 
+// http://www.html5rocks.com/en/tutorials/es6/promises/#toc-chaining
+function getAllExifData(photos) {
 
-function getExifData(photos, photoIndex) {
+  return new Promise(function(resolve, reject) {
 
-  console.log("getExifData invoked with photoIndex = " + photoIndex);
+    getMyExifData(photos[0]).then(function(photo) {
+      console.log("then invoked for photo 0");
+      photos.push(photo);
+      return getMyExifData(photos[1]);
+    }).then(function(photo){
+      console.log("then invoked for photo 1");
+      photos.push(photo);
+      return getMyExifData(photos[2]);
+    }).then(function(photo){
+      console.log("then invoked for photo 2");
+      photos.push(photo);
+      console.log("all photos retrieved, invoke resolve");
+      resolve(photos);
+    })
+  });
+}
 
-  if (photoIndex < photos.length) {
-    var photo = photos[photoIndex];
+
+var getMyExifData = function getExifData(photo) {
+
+  return new Promise(function(resolve, reject) {
+
     var filePath = photo.filePath;
 
     try {
@@ -135,23 +158,18 @@ function getExifData(photos, photoIndex) {
           //TODO need to continue on when this happens - this will definitely happen as I have photos with no exif data
           console.log("error returned from ExifImage");
           console.log('Error: '+ error.message);
+          resolve(null);
         }
         else {
-          //console.log("return from invoke exifImage");
-
           var dateTaken;
           if (typeof exifData.exif.DateTimeOriginal == 'undefined') {
-            //console.log("exif date data undefined for " + filePath);
             dateTaken = Date.now();
           }
           else
           {
-            //console.log(exifData.exif.DateTimeOriginal);
             dateTaken = parseDate(exifData.exif.DateTimeOriginal);
           }
           photo.dateTaken = dateTaken;
-
-          //console.log("typeof exifData.image.Orientation=" + (typeof exifData.image.Orientation).toString());
 
           var orientation;
           if (typeof exifData.image.Orientation == 'undefined') {
@@ -162,19 +180,105 @@ function getExifData(photos, photoIndex) {
           }
           photo.orientation = orientation;
 
-          photoIndex++;
-          getExifData(photos, photoIndex);
+          resolve(photo);
         }
       });
     } catch (error) {
       console.log('Error: ' + error.message);
+      reject();
     }
-  }
-  else {
-    console.log("exif retrieved for all photos");
-    mongoController.savePhotosToDB(photos);
-  }
+  });
 }
+
+//function getAllExifData(photos) {
+//
+//  var getExifDataPromise;
+//
+//  return new Promise(function(resolve, reject) {
+//
+//    var photoIndex = 0;
+//    //while (photoIndex < photos.length) {
+//    while (true) {
+//
+//      if (photoIndex == 0) {
+//        var photo = photos[photoIndex];
+//        getExifDataPromise = getExifData(photo);
+//      }
+//      getExifDataPromise.then(function(photo) {
+//        photos.push(photo);
+//        photoIndex++;
+//        if (photoIndex < photos.length) {
+//          photo = photos[photoIndex];
+//          getExifDataPromise = getExifData(photo);
+//        }
+//      });
+//    }
+//
+//    resolve(photos);
+//  });
+//}
+//
+
+//function getExifData(photos, photoIndex) {
+//
+//  var getExifDataPromise = new Promise(function (resolve, reject) {
+//    getExifDataWorker(this, photos, photoIndex);
+//  });
+//  return getExifDataPromise;
+//}
+//
+//function getExifDataWorker(getExifDataPromise, photos, photoIndex) {
+//
+//  console.log("getExifData invoked with photoIndex = " + photoIndex);
+//
+//  if (photoIndex < photos.length) {
+//    var photo = photos[photoIndex];
+//    var filePath = photo.filePath;
+//
+//    try {
+//      console.log("invoke exifImage for the file at: " + filePath);
+//      new ExifImage({ image : filePath }, function (error, exifData) {
+//        if (error) {
+//          //TODO need to continue on when this happens - this will definitely happen as I have photos with no exif data
+//          console.log("error returned from ExifImage");
+//          console.log('Error: '+ error.message);
+//          photoIndex++;
+//          getExifDataWorker(getExifDataPromise, photos, photoIndex);
+//        }
+//        else {
+//          var dateTaken;
+//          if (typeof exifData.exif.DateTimeOriginal == 'undefined') {
+//            dateTaken = Date.now();
+//          }
+//          else
+//          {
+//            dateTaken = parseDate(exifData.exif.DateTimeOriginal);
+//          }
+//          photo.dateTaken = dateTaken;
+//
+//          var orientation;
+//          if (typeof exifData.image.Orientation == 'undefined') {
+//            orientation = 1;
+//          }
+//          else {
+//            orientation = exifData.image.Orientation;
+//          }
+//          photo.orientation = orientation;
+//
+//          photoIndex++;
+//          getExifDataWorker(getExifDataPromise, photos, photoIndex);
+//        }
+//      });
+//    } catch (error) {
+//      console.log('Error: ' + error.message);
+//      this.reject();
+//    }
+//  }
+//  else {
+//    console.log("exif retrieved for all photos");
+//    getExifDataPromise.resolve(photos);
+//  }
+//}
 
 
 function parseDate(dateIn) {
