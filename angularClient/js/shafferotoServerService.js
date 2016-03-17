@@ -25,5 +25,15 @@ angular.module('shafferoto').service('shafferotoServerService', ['$http', functi
         var promise = $http.get(url, {});
         return promise;
     };
+
+    this.addTag = function(tagLabel) {
+
+        var url = self.baseUrl + "addTag";
+
+        var promise = $http.get(url, {
+            params: { tagLabel: tagLabel }
+        });
+        return promise;
+    }
 }]);
 

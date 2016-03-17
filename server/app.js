@@ -36,6 +36,22 @@ app.get('/getPhotos', function(req, res) {
 
 });
 
+
+app.get('/addTag', function (req, res) {
+
+  res.set('Access-Control-Allow-Origin', '*');
+
+  var tagLabel = req.query.tagLabel;
+
+  console.log("addTag invoked with parameter " + tagLabel);
+
+  var addTagPromise = dbController.addTagToDB(tagLabel);
+  addTagPromise.then(function() {
+    res.send("tag added");
+  });
+});
+
+
 app.get('/updateDB', function(req, res) {
 
   console.log("updateDB invoked");

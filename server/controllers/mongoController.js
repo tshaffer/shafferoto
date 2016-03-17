@@ -13,8 +13,12 @@ var photoSchema = new Schema({
     tags: [String],
     comments: [{ body: String, date: Date }],
 });
-
 var Photo = mongoose.model('Photo', photoSchema);
+
+var tagSchema = new Schema ({
+    label: String
+});
+var Tag = mongoose.model('Tag', tagSchema);
 
 function initialize() {
 
@@ -60,7 +64,6 @@ function fetchAllPhotos() {
             reject();
         }
     });
-
 }
 
 
@@ -112,6 +115,53 @@ function savePhotosToDB(photos) {
     console.log("all photos submitted to save engine");
 }
 
+
+function fetchAllTags() {
+
+    return new Promise(function (resolve, reject) {
+
+        if (dbOpened) {
+
+            Tag.find({}, function (err, tags) {
+                if (err) {
+                    console.log("error returned from mongoose query");
+                    reject();
+                }
+
+                tags.forEach(function (tagDoc) {
+                    tags.push({label: tagDoc.label});
+                });
+
+                resolve(tags);
+            });
+        }
+        else {
+            reject();
+        }
+    });
+};
+
+
+function addTagToDB(tagLabel) {
+
+    return new Promise(function (resolve, reject) {
+
+        var tagForDB = new Tag({
+            label: tagLabel
+        });
+
+        tagForDB.save(function (err) {
+            if (err) {
+                reject(err);
+            }
+            console.log("tag saved in db");
+            resolve();
+        });
+    });
+
+}
+
+
 function handleError(err) {
     console.log("handleError invoked");
     return;
@@ -121,5 +171,7 @@ module.exports = {
     initialize: initialize,
     fetchAllPhotos: fetchAllPhotos,
     hashAllPhotos: hashAllPhotos,
-    savePhotosToDB: savePhotosToDB
+    savePhotosToDB: savePhotosToDB,
+    fetchAllTags: fetchAllTags,
+    addTagToDB: addTagToDB
 }

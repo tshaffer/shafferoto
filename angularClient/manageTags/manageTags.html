@@ -1,1 +1,22 @@
 <h1>Manage Tags</h1>
+
+<form name="addTagForm" class="form-horizontal" role="form" ng-submit="submitForm()" novalidate>
+
+    <div class="col-sm-12 col-md-6 col-lg-12" id="tagLabelDiv">
+        <div class="form-group">
+            <label for="tag" class="col-sm-2 col-lg-1 col-md-2">Tag</label>
+
+            <div class="col-sm-8 col-lg-4 col-md-6">
+                <input type="text" class="form-control" id="tag" name="tag" ng-model="tagLabel"
+                       placeholder="Type the new tag" required>
+            </div>
+            <p col-sm-8 col-lg-6 col-md-6 ng-show="tagLabel.$invalid && submitted" class="help-block">Tag
+                is required.</p>
+        </div>
+    </div>
+
+    <div class="col-sm-12 col-md-12 col-lg-6" id="addTagDiv">
+        <button type="submit">Add Tag</button>
+    </div>
+
+</form>
