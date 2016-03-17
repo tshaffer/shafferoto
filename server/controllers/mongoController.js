@@ -16,7 +16,7 @@ var photoSchema = new Schema({
 
 var Photo = mongoose.model('Photo', photoSchema);
 
-function initializeMongo() {
+function initialize() {
 
     mongoose.connect('mongodb://localhost/shafferotoTest');
 
@@ -118,7 +118,7 @@ function handleError(err) {
 }
 
 module.exports = {
-    initializeMongo: initializeMongo,
+    initialize: initialize,
     fetchAllPhotos: fetchAllPhotos,
     hashAllPhotos: hashAllPhotos,
     savePhotosToDB: savePhotosToDB
