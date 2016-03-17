@@ -20,15 +20,37 @@
     <script src="lib/date.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-animate/angular-animate.min.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
 
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <link href='css/app.css' rel='stylesheet' type='text/css'>
 
     <script src="app.js"></script>
     <script src="js/shafferotoServerService.js"></script>
+    <script src="slideShow/slideShow.js"></script>
+    <script src="manageTags/manageTags.js"></script>
+    <script src="tagPhotos/tagPhotos.js"></script>
 
 </head>
-<body ng-controller="ShafferotoController">
-    <slider images="images"/>
+
+<!--<body ng-controller="ShafferotoController">-->
+<body>
+
+    <!--<slider images="images"/>-->
+
+    <header>
+        <nav class="navbar navbar-default">
+            <div class="container">
+                <ul class="nav navbar-nav" ng-controller="NavsCtrl">
+                    <li ng-class="navClass(nav)" ng-repeat="nav in navs"><a href="{{nav.link}}" ng-click="setSelectedNav(nav)">{{nav.label}}</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div ng-view></div>
+    </div>
+
 </body>
 </html>
