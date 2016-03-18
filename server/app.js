@@ -4,6 +4,7 @@ var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
 var fs = require("fs");
+var sha1 = require('sha1');
 
 var dbController = require('./controllers/mongoController');
 dbController.initialize();
@@ -31,6 +32,21 @@ app.get('/getPhotos', function(req, res) {
   fetchAllPhotosPromise.then(function(allPhotos) {
     var response = {};
     response.photos = allPhotos;
+    res.send(response);
+  });
+
+});
+
+
+app.get('/getTags', function(req, res) {
+
+  console.log("getTags invoked");
+  res.set('Access-Control-Allow-Origin', '*');
+
+  var fetchAllTagsPromise = dbController.fetchAllTags();
+  fetchAllTagsPromise.then(function(allTags) {
+    var response = {};
+    response.Tags = allTags;
     res.send(response);
   });
 
@@ -79,6 +95,8 @@ app.get('/updateDB', function(req, res) {
         var getExifDataPromise = exifReader.getAllExifData(photosToAdd);
         getExifDataPromise.then(function(photos) {
           console.log("getExifDataPromised resolved");
+
+
           dbController.savePhotosToDB(photos);
         });
       }
@@ -119,11 +137,11 @@ function findPhotos(dir, photoFiles) {
           photo.title = file;
 
           var filePath = path.format({
-            root : "/",
-            dir : dir,
-            base : file,
-            ext : "." + suffix,
-            name : "file"
+            root: "/",
+            dir: dir,
+            base: file,
+            ext: "." + suffix,
+            name: "file"
           });
           photo.url = path.relative(photosDir, filePath);
           photo.filePath = filePath;
@@ -131,6 +149,13 @@ function findPhotos(dir, photoFiles) {
           photo.orientation = 1;
 
           photoFiles.push(photo);
+
+          // code that gets sha1
+          //fs.readFile(filePath, function (err, data) {
+          //  console.log("File read complete");
+          //  var sha1 = sha1(data);
+          //  console.log(foo);
+          //});
         }
       });
     }

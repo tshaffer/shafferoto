@@ -122,13 +122,15 @@ function fetchAllTags() {
 
         if (dbOpened) {
 
-            Tag.find({}, function (err, tags) {
+            var tags = [];
+
+            Tag.find({}, function (err, dbTags) {
                 if (err) {
                     console.log("error returned from mongoose query");
                     reject();
                 }
 
-                tags.forEach(function (tagDoc) {
+                dbTags.forEach(function (tagDoc) {
                     tags.push({label: tagDoc.label});
                 });
 

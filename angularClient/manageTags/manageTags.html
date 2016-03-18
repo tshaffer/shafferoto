@@ -2,6 +2,16 @@
 
 <form name="addTagForm" class="form-horizontal" role="form" ng-submit="submitForm()" novalidate>
 
+    <div>
+        <h3>Existing Tags</h3>
+        <ul >
+            <H4 ng-repeat="tag in tags">{{tag}}</H4>
+        </ul>
+    </div>
+
+    <br/>
+    <br/>
+
     <div class="col-sm-12 col-md-6 col-lg-12" id="tagLabelDiv">
         <div class="form-group">
             <label for="tag" class="col-sm-2 col-lg-1 col-md-2">Tag</label>
