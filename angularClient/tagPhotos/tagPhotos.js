@@ -1,10 +1,10 @@
 angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServerService', function($scope, $shafferotoServerService ) {
 
-    var numColumns = 2;
+    var numColumns = 4;
 
     $scope.photos = [];
 
-    var photoTemplate = "<div class='ui-grid-cell-contents'><img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" ng-src=\"{{grid.getCellValue(row, col).url}}\" width=\"200px\"> </div>";
+    var photoTemplate = "<div class='ui-grid-cell-contents'><img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" ng-src=\"{{grid.getCellValue(row, col).url}}\" width=\"300px\"> </div>";
     var photoColumns = [];
     //var photoColumns = [
     //        { name: 'Photo', field: 'image', cellTemplate: photoTemplate },
@@ -13,7 +13,7 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
     $scope.gridOptions = {
         modifierKeysToMultiSelectCells: true,
-        rowHeight:200,
+        rowHeight:300,
         columnDefs: photoColumns
     };
 
@@ -34,8 +34,7 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
         var baseUrl = $shafferotoServerService.getBaseUrl() +  "photos/";
 
-        var index = 0;
-
+        var columnIndex = 0;
         var photo = {};
 
         result.data.photos.forEach(function(dbPhoto){
@@ -45,15 +44,15 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
             image.orientation = dbPhoto.orientation;
             image.title = dbPhoto.title;
 
-            var key = "image" + index.toString();
+            var key = "image" + columnIndex.toString();
 
             photo[key] = image;
-            index++;
+            columnIndex++;
 
-            if ((index % numColumns) == 0) {
+            if ((columnIndex % numColumns) == 0) {
                 $scope.photos.push(photo);
                 photo = {};
-                index = 0;
+                columnIndex = 0;
             }
 
         });
