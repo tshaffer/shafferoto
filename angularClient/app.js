@@ -1,7 +1,8 @@
 angular
     //.module('shafferoto', ['ngAnimate', 'ngRoute', 'ui.bootstrap'])
-    .module('shafferoto', ['ngAnimate', 'ngRoute'])
+    .module('shafferoto', ['ngAnimate', 'ngRoute', 'ui.grid'])
 
+    // code that originally displayed a slide show on startup
     //.controller('ShafferotoController', ['$scope', '$http', 'shafferotoServerService', function($scope, $http, $shafferotoServerService) {
     //
     //    $scope.images = [];

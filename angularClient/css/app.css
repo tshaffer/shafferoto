@@ -58,3 +58,8 @@ color: #222;
 .slide.ng-hide-add,.slide.ng-hide-remove.ng-hide-remove-active {
   opacity:1;
 }
+
+.photoGrid {
+	width: 500px;
+	height: 250px;
+}
