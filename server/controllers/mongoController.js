@@ -53,6 +53,7 @@ function fetchAllPhotos() {
                     reject();
                 }
 
+                photos = [];
                 photoDocs.forEach(function (photoDoc) {
                     photos.push({title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation});
                 });

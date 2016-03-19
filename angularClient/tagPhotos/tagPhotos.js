@@ -1,19 +1,32 @@
 angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServerService', function($scope, $shafferotoServerService ) {
 
+    var numColumns = 2;
+
     $scope.photos = [];
 
     var photoTemplate = "<div class='ui-grid-cell-contents'><img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" ng-src=\"{{grid.getCellValue(row, col).url}}\" width=\"200px\"> </div>";
+    var photoColumns = [];
+    //var photoColumns = [
+    //        { name: 'Photo', field: 'image', cellTemplate: photoTemplate },
+    //        { name: 'Photo2', field: 'image2', cellTemplate: photoTemplate }
+    //    ];
 
     $scope.gridOptions = {
         modifierKeysToMultiSelectCells: true,
         rowHeight:200,
-        columnDefs: [
-            { name: 'Photo', field: 'image', cellTemplate: photoTemplate },
-            { name: 'Photo2', field: 'image2', cellTemplate: photoTemplate }
-        ],
+        columnDefs: photoColumns
     };
 
     $scope.gridOptions.data = $scope.photos;
+
+    for (i = 0; i < numColumns; i++) {
+        photoColumn = {};
+        photoColumn.name = 'Photo' + i.toString();
+        photoColumn.field = 'image' + i.toString();
+        photoColumn.cellTemplate = photoTemplate;
+
+        photoColumns.push(photoColumn);
+    }
 
     var getPhotosPromise = $shafferotoServerService.getPhotos();
     getPhotosPromise.then(function (result) {
@@ -21,36 +34,31 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
         var baseUrl = $shafferotoServerService.getBaseUrl() +  "photos/";
 
-        var firstPhoto = true;
+        var index = 0;
 
-        var imageObj = {};
+        var photo = {};
 
-        var image1;
-        var image2;
+        result.data.photos.forEach(function(dbPhoto){
 
-        result.data.photos.forEach(function(photo){
+            var image = {};
+            image.url = baseUrl + dbPhoto.url;
+            image.orientation = dbPhoto.orientation;
+            image.title = dbPhoto.title;
 
-            var url = baseUrl + photo.url;
-            var orientation = photo.orientation;
-            var title = photo.title;
+            var key = "image" + index.toString();
 
-            if (firstPhoto) {
-                image1 = {};
-                image1.url = url;
-                image1.orientation = orientation;
-                image1.title = title;
-            }
-            else {
-                image2 = {};
-                image2.url = url;
-                image2.orientation = orientation;
-                image2.title = title;
+            photo[key] = image;
+            index++;
 
-                photo = { "image": image1, "image2": image2 };
+            if ((index % numColumns) == 0) {
                 $scope.photos.push(photo);
+                photo = {};
+                index = 0;
             }
-            firstPhoto = !firstPhoto;
+
         });
+
+        console.log("all done");
 
         //$scope.$broadcast("imagesInitialized");
     })
