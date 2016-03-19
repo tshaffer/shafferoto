@@ -1,1 +1,13 @@
-<div id="grid1" ui-grid="gridOptions" ui-grid-cellNav class="photoGrid"></div>
+ <div style="position: fixed; top: 60px; z-index: 69;">
+        <label>Tags:</label>
+        <select name="tags" id="tags" ng-model="selectedTag">
+            <option ng-repeat="tag in tags" value="{{tag}}">{{tag}}</option>
+        </select>
+        <button ng-click="tagPhotos();">
+            Tag Photos
+        </button>
+</div>
+
+ <div id="grid1" ui-grid="gridOptions" ui-grid-cellNav class="photoGrid" style="position:absolute; top: 90px;"></div>
+
+

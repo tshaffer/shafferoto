@@ -12,6 +12,7 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
     //    ];
 
     $scope.gridOptions = {
+        showHeader: false,
         modifierKeysToMultiSelectCells: true,
         rowHeight:300,
         columnDefs: photoColumns
@@ -62,4 +63,13 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
         //$scope.$broadcast("imagesInitialized");
     })
 
+    $scope.tags = [];
+    var getTagsPromise = $shafferotoServerService.getTags();
+    getTagsPromise.then(function (result) {
+        console.log("getTags successful");
+        result.data.Tags.forEach(function(tag){
+            $scope.tags.push(tag.label);
+        });
+        $scope.selectedTag = $scope.tags[0];
+    });
 }]);
