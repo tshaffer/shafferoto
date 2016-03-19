@@ -2,12 +2,16 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
     $scope.photos = [];
 
+    //<img ng-src="{{image.src}}" style="height: 100%;" ng-class="{ rotate90: image.orientation==6, rotate180: image.orientation==3 }" />
+
+    var photoTemplate = "<div class='ui-grid-cell-contents'><img width=\"200px\" ng-class=\"{ rotate90: image.orientation==6, rotate180: image.orientation==3 }\" ng-src=\"{{grid.getCellValue(row, col)}}\"> </div>";
+
     $scope.gridOptions = {
         modifierKeysToMultiSelectCells: true,
         rowHeight:200,
         columnDefs: [
-            { name: 'Photo', field: 'image', cellTemplate:"<div class='ui-grid-cell-contents'><img width=\"200px\" ng-src=\"{{grid.getCellValue(row, col)}}\" lazy-src> </div>"},
-            { name: 'Photo2', field: 'image2', cellTemplate:"<div class='ui-grid-cell-contents'><img width=\"200px\" ng-src=\"{{grid.getCellValue(row, col)}}\" lazy-src> </div>"}
+            { name: 'Photo', field: 'image', cellTemplate: photoTemplate },
+            { name: 'Photo2', field: 'image2', cellTemplate: photoTemplate }
         ],
     };
 
