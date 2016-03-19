@@ -21,12 +21,19 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
         }];
 
     $scope.gridOptions = {
-        enableSorting: true,
+        modifierKeysToMultiSelectCells: true,
+        //enableSorting: true,
+        //enableCellSelection: true,
+        //enableRowSelection: false,
+        ////enableCellEditOnFocus: true,
+        //enableCellEdit: true,
         columnDefs: [
             { name: 'First', field: 'firstName' },
-            { name: 'Last', field: 'lastName' },
-            { name: 'Photo', field: 'image', cellTemplate:"<img width=\"50px\" ng-src=\"{{grid.getCellValue(row, col)}}\" lazy-src>"},
-            { name: 'Photo2', field: 'image2', cellTemplate:"<img width=\"50px\" ng-src=\"{{grid.getCellValue(row, col)}}\" lazy-src>"}
+            //{ name: 'Photo', field: 'image', cellTemplate:"<div><p>foo</p> <img width=\"50px\" ng-src=\"{{grid.getCellValue(row, col)}}\" lazy-src></div>"},
+            //{ name: 'Photo', field: 'image', cellTemplate:"<img width=\"50px\" ng-src=\"{{grid.getCellValue(row, col)}}\" lazy-src>"},
+            { name: 'Photo', field: 'image', cellTemplate:"<div class='ui-grid-cell-contents'><img width=\"50px\" ng-src=\"{{grid.getCellValue(row, col)}}\" lazy-src> </div>"},
+            { name: 'Last', field: 'lastName'  },
+            { name: 'Photo2', field: 'image2', cellTemplate:"<div class='ui-grid-cell-contents'><img width=\"50px\" ng-src=\"{{grid.getCellValue(row, col)}}\" lazy-src> </div>"}
         ],
     };
 
