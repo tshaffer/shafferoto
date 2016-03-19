@@ -2,9 +2,7 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
     $scope.photos = [];
 
-    //<img ng-src="{{image.src}}" style="height: 100%;" ng-class="{ rotate90: image.orientation==6, rotate180: image.orientation==3 }" />
-
-    var photoTemplate = "<div class='ui-grid-cell-contents'><img width=\"200px\" ng-class=\"{ rotate90: image.orientation==6, rotate180: image.orientation==3 }\" ng-src=\"{{grid.getCellValue(row, col)}}\"> </div>";
+    var photoTemplate = "<div class='ui-grid-cell-contents'><img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" ng-src=\"{{grid.getCellValue(row, col).url}}\" width=\"200px\"> </div>";
 
     $scope.gridOptions = {
         modifierKeysToMultiSelectCells: true,
@@ -24,18 +22,31 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
         var baseUrl = $shafferotoServerService.getBaseUrl() +  "photos/";
 
         var firstPhoto = true;
+
+        var imageObj = {};
+
         var image1;
         var image2;
 
         result.data.photos.forEach(function(photo){
 
             var url = baseUrl + photo.url;
+            var orientation = photo.orientation;
+            var title = photo.title;
 
             if (firstPhoto) {
-                image1 = url;
+                image1 = {};
+                image1.url = url;
+                image1.orientation = orientation;
+                image1.title = title;
             }
             else {
-                photo = { "image": image1, "image2": url };
+                image2 = {};
+                image2.url = url;
+                image2.orientation = orientation;
+                image2.title = title;
+
+                photo = { "image": image1, "image2": image2 };
                 $scope.photos.push(photo);
             }
             firstPhoto = !firstPhoto;
