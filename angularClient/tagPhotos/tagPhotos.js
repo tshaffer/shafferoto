@@ -6,8 +6,16 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
     var photoTemplate = "";
     photoTemplate  = "<div class='ui-grid-cell-contents'>";
-    //photoTemplate += "<div><img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" ng-src=\"{{grid.getCellValue(row, col).u\rl}}\" width=\"200px\"> </div>";
-    photoTemplate += "<div><img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" ng-src=\"{{grid.getCellValue(row, col).url}}\" width=\"250px\" height=\"250px\" max-height=\"150px\"</div>";
+
+    //photoTemplate += "<div><img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" ng-src=\"{{grid.getCellValue(row, col).url}}\" ";
+    //photoTemplate += "width={{getImageWidth()}} height=getImageHeight()</div>";
+    //photoTemplate += "height=\"250px\" max-height=\"150px\"</div>";
+    //photoTemplate += "height=\"{getImageHeight(grid.getCellValue(row, col))}\" max-height=\"150px\"</div>";
+
+    //photoTemplate += "<div><img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" ng-src=\"{{grid.getCellValue(row, col).url}}\" width=\"250px\" height=\"250px\" max-height=\"150px\"</div>";
+    //photoTemplate += "<div><img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" ng-src=\"{{grid.getCellValue(row, col).url}}\" width=\"{{grid.getCellValue(row, col).width}}\" height=\"{{grid.getCellValue(row, col).height}}\" max-height=\"150px\"</div>";
+    photoTemplate += "<div><img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" ng-src=\"{{grid.getCellValue(row, col).url}}\" width=\"{{grid.getCellValue(row, col).width}}\" height=\"{{grid.getCellValue(row, col).height}}\"</div>";
+
     photoTemplate += "<div><p>Pizza is good</p></div>";
     photoTemplate += "</div>";
 
@@ -16,6 +24,21 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
     //        { name: 'Photo', field: 'image', cellTemplate: photoTemplate },
     //        { name: 'Photo2', field: 'image2', cellTemplate: photoTemplate }
     //    ];
+
+    $scope.getImageWidth = function() {
+        console.log("getImageWidth invoked");
+        return '\"250px\"';
+    };
+
+    $scope.getImageHeight = function() {
+        console.log("getImageHeight invoked");
+        return '\"250px\" max-height=\"150px\"';
+    };
+
+    function getImageHeight(foo) {
+        console.log("getImageHeight invoked");
+        return '\"250px\" max-height=\"150px\"';
+    };
 
     $scope.gridOptions = {
         showHeader: false,
@@ -50,6 +73,26 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
             image.url = baseUrl + dbPhoto.url;
             image.orientation = dbPhoto.orientation;
             image.title = dbPhoto.title;
+
+            var width = dbPhoto.width;
+            var height = dbPhoto.height;
+            var ratio = height / width;
+
+            var heightRatio = height / 250;
+            var updatedWidth = width/(height/250);
+            image.width = updatedWidth;
+            image.height = 250;
+            //image.width = 250;
+            //image.height = 250;
+            console.log("widht/height ratio is: " + (image.width / image.height).toString());
+
+            //console.log("retrieve width and height for " + image.url);
+            //img = new Image();
+            //img.onload = function () {
+            //    console.log(image.url);
+            //    console.log(this.width + " " + this.height);
+            //};
+            //img.src = image.url;
 
             var key = "image" + columnIndex.toString();
 

@@ -48,6 +48,17 @@ var getExifData = function getExifData(photo) {
                     resolve(null);
                 }
                 else {
+                    console.log("return from ExifImage");
+                    var imageWidth = 0;
+                    var imageHeight = 0;
+                    if (typeof exifData.exif.ExifImageWidth == "number" && typeof exifData.exif.ExifImageHeight == "number") {
+                        imageWidth = exifData.exif.ExifImageWidth;
+                        imageHeight = exifData.exif.ExifImageHeight;
+                    }
+                    console.log(exifData.exif.ExifImageWidth.toString() + " " + exifData.exif.ExifImageHeight.toString());
+                    photo.imageWidth = imageWidth;
+                    photo.imageHeight = imageHeight;
+
                     var dateTaken;
                     if (typeof exifData.exif.DateTimeOriginal == 'undefined') {
                         dateTaken = Date.now();

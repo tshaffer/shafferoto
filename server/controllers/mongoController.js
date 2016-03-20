@@ -10,6 +10,8 @@ var photoSchema = new Schema({
     url: String,
     dateTaken: Date,
     orientation: Number,
+    imageWidth: Number,
+    imageHeight: Number,
     tags: [String],
     comments: [{ body: String, date: Date }],
 });
@@ -55,7 +57,7 @@ function fetchAllPhotos() {
 
                 photos = [];
                 photoDocs.forEach(function (photoDoc) {
-                    photos.push({title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation});
+                    photos.push({title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation, width: photoDoc.imageWidth, height: photoDoc.imageHeight });
                 });
 
                 resolve(photos);
@@ -105,7 +107,9 @@ function savePhotosToDB(photos) {
             url: photo.url,
             tags: [],
             dateTaken: photo.dateTaken,
-            orientation: photo.orientation
+            orientation: photo.orientation,
+            imageWidth: photo.imageWidth,
+            imageHeight: photo.imageHeight
         });
 
         photoForDB.save(function (err) {
