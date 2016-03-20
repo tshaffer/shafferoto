@@ -4,7 +4,13 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
     $scope.photos = [];
 
-    var photoTemplate = "<div class='ui-grid-cell-contents'><img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" ng-src=\"{{grid.getCellValue(row, col).url}}\" width=\"300px\"> </div>";
+    var photoTemplate = "";
+    photoTemplate  = "<div class='ui-grid-cell-contents'>";
+    //photoTemplate += "<div><img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" ng-src=\"{{grid.getCellValue(row, col).u\rl}}\" width=\"200px\"> </div>";
+    photoTemplate += "<div><img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" ng-src=\"{{grid.getCellValue(row, col).url}}\" width=\"150px\" height=\"150px\" maxHeight=\"150px\"</div>";
+    photoTemplate += "<div><p>Pizza is good</p></div>";
+    photoTemplate += "</div>";
+
     var photoColumns = [];
     //var photoColumns = [
     //        { name: 'Photo', field: 'image', cellTemplate: photoTemplate },
