@@ -31,8 +31,12 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
     photoTemplate += "</div>";
 
     //photoTemplate  = "<div class='ui-grid-cell-contents'>";
+
+
+
+
     photoTemplate  = "<div><div class='ui-grid-cell-contents'>";
-    photoTemplate += "<img height='{{grid.getCellValue(row, col).height}}' width='{{grid.getCellValue(row, col).width}}' ng-src=\"{{grid.getCellValue(row, col).url}}\">";
+    photoTemplate += "<img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" height='{{grid.getCellValue(row, col).height}}' width='{{grid.getCellValue(row, col).width}}' ng-src=\"{{grid.getCellValue(row, col).url}}\">";
     photoTemplate += "</div>";
 
     photoTemplate += "<div><p>Pizza is good</p></div>";
@@ -94,18 +98,36 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
             image.orientation = dbPhoto.orientation;
             image.title = dbPhoto.title;
 
+            // this might work if the image was aligned at the top
             var width = dbPhoto.width;
             var height = dbPhoto.height;
             var ratio = height / width;
+
+            if (image.orientation == 6) {
+                var heightRatio = height / 250;
+                var updatedWidth = width/(height/250);
+                image.width = 250;
+                image.height = updatedWidth;
+                image.maxHeight = updatedWidth;
+            }
+            else {
+                var heightRatio = height / 250;
+                var updatedWidth = width/(height/250);
+                image.width = updatedWidth;
+                image.height = 250;
+                image.maxHeight = 250;
+            }
+            // end of section
 
             var heightRatio = height / 250;
             var updatedWidth = width/(height/250);
             image.width = updatedWidth;
             image.height = 250;
             image.maxHeight = 250;
+
             //image.width = 250;
             //image.height = 250;
-            console.log("widht/height ratio is: " + (image.width / image.height).toString());
+            console.log("width/height ratio is: " + (image.width / image.height).toString());
 
             //console.log("retrieve width and height for " + image.url);
             //img = new Image();
