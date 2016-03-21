@@ -6,6 +6,10 @@
 	-webkit-transform: rotate(180deg);
 }
 
+.centerText {
+	text-align: center
+}
+
 *{
 font-family: 'Open Sans', sans-serif;
 }

@@ -9,7 +9,7 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
     photoTemplate += "<img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" height='{{grid.getCellValue(row, col).height}}' width='{{grid.getCellValue(row, col).width}}' ng-src=\"{{grid.getCellValue(row, col).url}}\">";
     photoTemplate += "</div>";
 
-    photoTemplate += "<div><p>Pizza is good</p></div>";
+    photoTemplate += "<div><p class='centerText'>{{grid.getCellValue(row, col).tagList}}</p></div>";
     photoTemplate += "</div>";
 
     var photoColumns = [];
@@ -57,8 +57,13 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
             image.width = updatedWidth;
             image.height = 250;
             image.maxHeight = 250;
+            //console.log("width/height ratio is: " + (image.width / image.height).toString());
 
-            console.log("width/height ratio is: " + (image.width / image.height).toString());
+            image.tagList = "";
+            dbPhoto.tags.forEach(function(tag) {
+               image.tagList += tag + ", ";
+            });
+            image.tagList = image.tagList.substring(0, image.tagList.length - 2);
 
             var key = "image" + columnIndex.toString();
             photo[key] = image;

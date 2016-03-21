@@ -57,7 +57,7 @@ function fetchAllPhotos() {
 
                 photos = [];
                 photoDocs.forEach(function (photoDoc) {
-                    photos.push({title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation, width: photoDoc.imageWidth, height: photoDoc.imageHeight });
+                    photos.push({id: photoDoc.id, title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation, width: photoDoc.imageWidth, height: photoDoc.imageHeight, tags: photoDoc.tags });
                 });
 
                 resolve(photos);
