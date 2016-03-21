@@ -91,4 +91,31 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
         });
         $scope.selectedTag = $scope.tags[0];
     });
+
+    $scope.gridOptions.onRegisterApi = function(gridApi){
+        $scope.gridApi = gridApi;
+        gridApi.cellNav.on.navigate($scope,function(newRowCol, oldRowCol){
+            // var rowCol = {row: newRowCol.row.index, col:newRowCol.col.colDef.name};
+            // var msg = 'New RowCol is ' + angular.toJson(rowCol);
+            // if(oldRowCol){
+            //    rowCol = {row: oldRowCol.row.index, col:oldRowCol.col.colDef.name};
+            //    msg += ' Old RowCol is ' + angular.toJson(rowCol);
+            // }
+            console.log('navigation event');
+        });
+    };
+
+    $scope.getCurrentSelection = function() {
+        var values = [];
+        var currentSelection = $scope.gridApi.cellNav.getCurrentSelection();
+        for (var i = 0; i < currentSelection.length; i++) {
+            //values.push(currentSelection[i].row.entity[currentSelection[i].col.name])
+        }
+        //$scope.printSelection = values.toString();
+        // currentSelection[i].row.entity - contains the image objects for the row of the selected item (the keys are: 'image0', 'image1', 'image2', 'image3')
+        // currentSelection[i].col.name = 'Photo1'
+        // 'Photo0' is the first column, 'Photo1' is the second column, etc.
+        // so if 'Photo1' is the value for the col.name, the selectedItem is
+        //      currentSelection[i].row.entity.['image1']
+    };
 }]);
