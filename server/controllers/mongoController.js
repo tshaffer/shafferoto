@@ -169,6 +169,21 @@ function addTagToDB(tagLabel) {
 }
 
 
+function assignTags(photosUpdateSpec) {
+
+    photosUpdateSpec.forEach(function (photoToUpdate) {
+
+        var id = photoToUpdate.id;
+        var tags = photoToUpdate.tags;
+
+        // for now, go ahead and try to do all of these immediately
+        Photo.update({_id: id}, {$set: {tags: tags}}, function(err) {
+            console.log("update complete, err = " + err);
+        });
+    });
+}
+
+
 function handleError(err) {
     console.log("handleError invoked");
     return;
@@ -180,5 +195,6 @@ module.exports = {
     hashAllPhotos: hashAllPhotos,
     savePhotosToDB: savePhotosToDB,
     fetchAllTags: fetchAllTags,
-    addTagToDB: addTagToDB
+    addTagToDB: addTagToDB,
+    assignTags: assignTags
 }

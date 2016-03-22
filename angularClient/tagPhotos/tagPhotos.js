@@ -68,6 +68,9 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
             });
             image.tagList = image.tagList.substring(0, image.tagList.length - 2);
 
+            // TODO - doing this for expediency - best design?
+            image.dbPhoto = dbPhoto;
+
             var key = "image" + columnIndex.toString();
             photo[key] = image;
             columnIndex++;
@@ -113,11 +116,43 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
     };
 
     $scope.tagPhotos = function() {
+
+        // get the photos that the user has selected
         var selectedPhotos = $scope.getCurrentSelection();
 
-        console.log("Apply tag " + $scope.selectedTag + " to");
+        // apply the specific tag to each photo (that doesn't already have the tag), one at a time
+        //console.log("Apply tag " + $scope.selectedTag + " to");
+
+
+        // package up a request to send to the server
+        // package should include all records that need to get updated
+        //  n photos
+        //      each photo contains an id and a tags array
+        var photosUpdateSpec = [];
         selectedPhotos.forEach(function(selectedPhoto) {
-            console.log(" " + selectedPhoto.title);
+            if (selectedPhoto.dbPhoto.tags.indexOf($scope.selectedTag) >= 0)  {
+                console.log(selectedPhoto.title + " already contains the tag " + $scope.selectedTag);
+            }
+            else {
+
+                photoUpdate = {};
+
+                photoUpdate.id = selectedPhoto.dbPhoto.id;
+                photoUpdate.tags = selectedPhoto.dbPhoto.tags;
+                // note - this probably causes the local selectedPhoto to get updated as well
+                photoUpdate.tags.push($scope.selectedTag);
+
+                photosUpdateSpec.push(photoUpdate);
+
+                var assignTagsPromise = $shafferotoServerService.assignTags(photosUpdateSpec);
+                assignTagsPromise.then(function (result) {
+                    console.log("getPhotos successful");
+                });
+
+                //selectedPhoto.dbPhoto.tags.push($scope.selectedTag);
+                //// TODO - also add it to the selectedPhoto tagList
+                //Photo.update({ _id: id }, { $set: { size: 'large' }}, callback);
+            }
         });
     };
 }]);

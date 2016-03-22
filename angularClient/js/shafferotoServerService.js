@@ -43,5 +43,16 @@ angular.module('shafferoto').service('shafferotoServerService', ['$http', functi
         });
         return promise;
     }
+
+    this.assignTags = function(photosUpdateSpec) {
+
+        var url = self.baseUrl + "assignTags";
+
+        var promise = $http.get(url, {
+            params: { photosUpdateSpec: photosUpdateSpec }
+        });
+        return promise;
+    }
+
 }]);
 

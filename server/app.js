@@ -68,42 +68,57 @@ app.get('/addTag', function (req, res) {
 });
 
 
-app.get('/updateDB', function(req, res) {
+app.get('/assignTags', function (req, res) {
 
-  console.log("updateDB invoked");
   res.set('Access-Control-Allow-Origin', '*');
 
-  // retrieve photos that exist in db; get them in a hash table
-  var hashAllPhotosPromise = dbController.hashAllPhotos();
-  hashAllPhotosPromise.then(function(photosInDB) {
+  var photosUpdateSpec = req.query.photosUpdateSpec;
 
-    console.log('Look for photos in ' + photosDir);
-    var photosOnDrive = [];
-    photosOnDrive = findPhotos(photosDir, photosOnDrive);
+  console.log("assignTags invoked");
 
-    if (photosOnDrive.length > 0) {
-
-      // look for photosOnDrive that aren't in photosInDB
-      var photosToAdd = [];
-      photosOnDrive.forEach(function (photoOnDrive) {
-        if ( !photosInDB.hasOwnProperty( photoOnDrive.url ) ) {
-          photosToAdd.push(photoOnDrive);
-        }
-      });
-
-      if (photosToAdd.length > 0) {
-        var getExifDataPromise = exifReader.getAllExifData(photosToAdd);
-        getExifDataPromise.then(function(photos) {
-          console.log("getExifDataPromised resolved");
-
-
-          dbController.savePhotosToDB(photos);
-        });
-      }
-    }
-
-    res.send("ok");
+  var assignTagsPromise = dbController.assignTags(photosUpdateSpec);
+  assignTagsPromise.then(function() {
+    res.send("tags assigned");
   });
+});
+
+
+app.get('/updateDB', function(req, res) {
+
+console.log("updateDB invoked");
+res.set('Access-Control-Allow-Origin', '*');
+
+// retrieve photos that exist in db; get them in a hash table
+var hashAllPhotosPromise = dbController.hashAllPhotos();
+hashAllPhotosPromise.then(function(photosInDB) {
+
+  console.log('Look for photos in ' + photosDir);
+  var photosOnDrive = [];
+  photosOnDrive = findPhotos(photosDir, photosOnDrive);
+
+  if (photosOnDrive.length > 0) {
+
+    // look for photosOnDrive that aren't in photosInDB
+    var photosToAdd = [];
+    photosOnDrive.forEach(function (photoOnDrive) {
+      if ( !photosInDB.hasOwnProperty( photoOnDrive.url ) ) {
+        photosToAdd.push(photoOnDrive);
+      }
+    });
+
+    if (photosToAdd.length > 0) {
+      var getExifDataPromise = exifReader.getAllExifData(photosToAdd);
+      getExifDataPromise.then(function(photos) {
+        console.log("getExifDataPromised resolved");
+
+
+        dbController.savePhotosToDB(photos);
+      });
+    }
+  }
+
+  res.send("ok");
+});
 
 });
 
