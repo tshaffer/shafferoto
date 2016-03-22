@@ -25,13 +25,16 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
     for (i = 0; i < numColumns; i++) {
         photoColumn = {};
-        photoColumn.name = 'Photo' + i.toString();
-        photoColumn.field = 'image' + i.toString();
+        //photoColumn.name = 'Photo' + i.toString();
+        photoColumn.name = 'image' + i.toString();
+        photoColumn.field = photoColumn.name;
+        //photoColumn.field = 'image' + i.toString();
         photoColumn.cellTemplate = photoTemplate;
 
         photoColumns.push(photoColumn);
     }
 
+    // retrieve all photos from the db
     var getPhotosPromise = $shafferotoServerService.getPhotos();
     getPhotosPromise.then(function (result) {
         console.log("getPhotos successful");
@@ -82,6 +85,7 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
         //$scope.$broadcast("imagesInitialized");
     })
 
+    // retrieve all tags from the db
     $scope.tags = [];
     var getTagsPromise = $shafferotoServerService.getTags();
     getTagsPromise.then(function (result) {
@@ -95,27 +99,25 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
     $scope.gridOptions.onRegisterApi = function(gridApi){
         $scope.gridApi = gridApi;
         gridApi.cellNav.on.navigate($scope,function(newRowCol, oldRowCol){
-            // var rowCol = {row: newRowCol.row.index, col:newRowCol.col.colDef.name};
-            // var msg = 'New RowCol is ' + angular.toJson(rowCol);
-            // if(oldRowCol){
-            //    rowCol = {row: oldRowCol.row.index, col:oldRowCol.col.colDef.name};
-            //    msg += ' Old RowCol is ' + angular.toJson(rowCol);
-            // }
             console.log('navigation event');
         });
     };
 
     $scope.getCurrentSelection = function() {
-        var values = [];
+        var selectedPhotos = [];
         var currentSelection = $scope.gridApi.cellNav.getCurrentSelection();
         for (var i = 0; i < currentSelection.length; i++) {
-            //values.push(currentSelection[i].row.entity[currentSelection[i].col.name])
+            selectedPhotos.push(currentSelection[i].row.entity[currentSelection[i].col.name]);
         }
-        //$scope.printSelection = values.toString();
-        // currentSelection[i].row.entity - contains the image objects for the row of the selected item (the keys are: 'image0', 'image1', 'image2', 'image3')
-        // currentSelection[i].col.name = 'Photo1'
-        // 'Photo0' is the first column, 'Photo1' is the second column, etc.
-        // so if 'Photo1' is the value for the col.name, the selectedItem is
-        //      currentSelection[i].row.entity.['image1']
+        return selectedPhotos;
+    };
+
+    $scope.tagPhotos = function() {
+        var selectedPhotos = $scope.getCurrentSelection();
+
+        console.log("Apply tag " + $scope.selectedTag + " to");
+        selectedPhotos.forEach(function(selectedPhoto) {
+            console.log(" " + selectedPhoto.title);
+        });
     };
 }]);
