@@ -76,10 +76,13 @@ app.get('/assignTags', function (req, res) {
 
   console.log("assignTags invoked");
 
-  var assignTagsPromise = dbController.assignTags(photosUpdateSpec);
-  assignTagsPromise.then(function() {
-    res.send("tags assigned");
-  });
+  dbController.assignTags(photosUpdateSpec);
+  res.send("tags assigned");
+
+  //var assignTagsPromise = dbController.assignTags(photosUpdateSpec);
+  //assignTagsPromise.then(function() {
+  //  res.send("tags assigned");
+  //});
 });
 
 

@@ -171,7 +171,20 @@ function addTagToDB(tagLabel) {
 
 function assignTags(photosUpdateSpec) {
 
-    photosUpdateSpec.forEach(function (photoToUpdate) {
+    var photosToUpdate = [];
+
+    if (typeof photosUpdateSpec == "object") {
+        photosUpdateSpec.forEach(function (photoUpdateSpec) {
+            var photoToUpdate = JSON.parse(photoUpdateSpec);
+            photosToUpdate.push(photoToUpdate);
+        })
+    }
+    else {
+        var photoUpdateSpec = JSON.parse(photosUpdateSpec);
+        photosToUpdate.push(photoUpdateSpec);
+    }
+
+    photosToUpdate.forEach(function (photoToUpdate) {
 
         var id = photoToUpdate.id;
         var tags = photoToUpdate.tags;
