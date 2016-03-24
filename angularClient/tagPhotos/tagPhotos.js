@@ -115,73 +115,77 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
         return selectedPhotos;
     };
 
-    $scope.untagPhotos = function() {
+    $scope.getAssignTagPhotoToUpdate = function(photo) {
 
-        // get the photos that the user has selected
+        var photoToUpdate = null;
+
+        if (photo.dbPhoto.tags.indexOf($scope.selectedTag) >= 0)  {
+            console.log(photo.title + " already contains the tag " + $scope.selectedTag);
+        }
+        else {
+
+            photoToUpdate = {};
+
+            photoToUpdate.id = photo.dbPhoto.id;
+            photoToUpdate.tags = photo.dbPhoto.tags;
+            photoToUpdate.tags.push($scope.selectedTag);
+        }
+
+        return photoToUpdate;
+    };
+
+    $scope.getUnassignTagPhotoToUpdate = function(photo) {
+
+        var photoToUpdate = null;
+
+        var indexOfTag = photo.dbPhoto.tags.indexOf($scope.selectedTag);
+        if (indexOfTag < 0) {
+            console.log(photo.title + " doesn't contains the tag " + $scope.selectedTag);
+        }
+        else {
+            // remove tag from tags array
+            photoToUpdate = {};
+
+            photoToUpdate.id = photo.dbPhoto.id;
+            photoToUpdate.tags = photo.dbPhoto.tags;
+            photoToUpdate.tags.splice(indexOfTag, 1);
+        }
+    };
+
+    $scope.getPhotosToUpdate = function(getPhotoToUpdate) {
+
         var selectedPhotos = $scope.getCurrentSelection();
 
         var photosUpdateSpec = [];
         selectedPhotos.forEach(function(selectedPhoto) {
 
-            var indexOfTag = selectedPhoto.dbPhoto.tags.indexOf($scope.selectedTag);
-            if (indexOfTag < 0) {
-                console.log(selectedPhoto.title + " doesn't contains the tag " + $scope.selectedTag);
-            }
-            else {
-                // remove tag from tags array
-                photoUpdate = {};
-
-                photoUpdate.id = selectedPhoto.dbPhoto.id;
-                photoUpdate.tags = selectedPhoto.dbPhoto.tags;
-
-                //// note - this probably causes the local selectedPhoto to get updated as well (CONFIRMED - IT DOES!)
-                photoUpdate.tags.splice(indexOfTag, 1);
-
-                photosUpdateSpec.push(photoUpdate);
-
+            var photoToUpdate = getPhotoToUpdate(selectedPhoto);
+            if (photoToUpdate != null) {
+                photosUpdateSpec.push(photoToUpdate);
             }
         });
 
-        var unassignTagsPromise = $shafferotoServerService.updateTags(photosUpdateSpec);
-        unassignTagsPromise.then(function (result) {
-            console.log("unassignTags successful");
+        return photosUpdateSpec;
+    };
+
+    $scope.updateTags = function(photosUpdateSpec) {
+
+        var updateTagsPromise = $shafferotoServerService.updateTags(photosUpdateSpec);
+        updateTagsPromise.then(function (result) {
+            console.log("updateTags successful");
         });
+
+    };
+    
+    $scope.untagPhotos = function() {
+
+        var photosUpdateSpec = $scope.getPhotosToUpdate($scope.getUnassignTagPhotoToUpdate);
+        $scope.updateTags(photosUpdateSpec);
     };
 
     $scope.tagPhotos = function() {
 
-        // get the photos that the user has selected
-        var selectedPhotos = $scope.getCurrentSelection();
-
-        // apply the specific tag to each photo (that doesn't already have the tag), one at a time
-        //console.log("Apply tag " + $scope.selectedTag + " to");
-
-
-        // package up a request to send to the server
-        // package should include all records that need to get updated
-        //  n photos
-        //      each photo contains an id and a tags array
-        var photosUpdateSpec = [];
-        selectedPhotos.forEach(function(selectedPhoto) {
-            if (selectedPhoto.dbPhoto.tags.indexOf($scope.selectedTag) >= 0)  {
-                console.log(selectedPhoto.title + " already contains the tag " + $scope.selectedTag);
-            }
-            else {
-
-                photoUpdate = {};
-
-                photoUpdate.id = selectedPhoto.dbPhoto.id;
-                photoUpdate.tags = selectedPhoto.dbPhoto.tags;
-                // note - this probably causes the local selectedPhoto to get updated as well (CONFIRMED - IT DOES!)
-                photoUpdate.tags.push($scope.selectedTag);
-
-                photosUpdateSpec.push(photoUpdate);
-            }
-        });
-
-        var assignTagsPromise = $shafferotoServerService.updateTags(photosUpdateSpec);
-        assignTagsPromise.then(function (result) {
-            console.log("assignTags successful");
-        });
+        var photosUpdateSpec = $scope.getPhotosToUpdate($scope.getAssignTagPhotoToUpdate);
+        $scope.updateTags(photosUpdateSpec);
     };
 }]);
