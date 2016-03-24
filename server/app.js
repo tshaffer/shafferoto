@@ -68,29 +68,16 @@ app.get('/addTag', function (req, res) {
 });
 
 
-app.get('/assignTags', function (req, res) {
+app.get('/updateTags', function (req, res) {
 
   res.set('Access-Control-Allow-Origin', '*');
 
   var photosUpdateSpec = req.query.photosUpdateSpec;
 
-  console.log("assignTags invoked");
+  console.log("updateTags invoked");
 
   dbController.updateTags(photosUpdateSpec);
-  res.send("tags assigned");
-});
-
-
-app.get('/unassignTags', function (req, res) {
-
-  res.set('Access-Control-Allow-Origin', '*');
-
-  var photosUpdateSpec = req.query.photosUpdateSpec;
-
-  console.log("unassignTags invoked");
-
-  dbController.updateTags(photosUpdateSpec);
-  res.send("tags unassigned");
+  res.send("tags updated");
 });
 
 

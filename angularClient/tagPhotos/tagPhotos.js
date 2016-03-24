@@ -128,7 +128,6 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
                 console.log(selectedPhoto.title + " doesn't contains the tag " + $scope.selectedTag);
             }
             else {
-
                 // remove tag from tags array
                 photoUpdate = {};
 
@@ -140,7 +139,7 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
                 photosUpdateSpec.push(photoUpdate);
 
-                var unassignTagsPromise = $shafferotoServerService.unassignTags(photosUpdateSpec);
+                var unassignTagsPromise = $shafferotoServerService.updateTags(photosUpdateSpec);
                 unassignTagsPromise.then(function (result) {
                     console.log("unassignTags successful");
                 });
@@ -178,14 +177,10 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
                 photosUpdateSpec.push(photoUpdate);
 
-                var assignTagsPromise = $shafferotoServerService.assignTags(photosUpdateSpec);
+                var assignTagsPromise = $shafferotoServerService.updateTags(photosUpdateSpec);
                 assignTagsPromise.then(function (result) {
                     console.log("assignTags successful");
                 });
-
-                //selectedPhoto.dbPhoto.tags.push($scope.selectedTag);
-                //// TODO - also add it to the selectedPhoto tagList
-                //Photo.update({ _id: id }, { $set: { size: 'large' }}, callback);
             }
         });
     };
