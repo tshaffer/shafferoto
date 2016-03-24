@@ -169,7 +169,7 @@ function addTagToDB(tagLabel) {
 }
 
 
-function assignTags(photosUpdateSpec) {
+function updateTags(photosUpdateSpec) {
 
     var photosToUpdate = [];
 
@@ -209,5 +209,5 @@ module.exports = {
     savePhotosToDB: savePhotosToDB,
     fetchAllTags: fetchAllTags,
     addTagToDB: addTagToDB,
-    assignTags: assignTags
+    updateTags: updateTags
 }

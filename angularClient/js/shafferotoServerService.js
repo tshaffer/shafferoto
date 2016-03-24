@@ -54,5 +54,15 @@ angular.module('shafferoto').service('shafferotoServerService', ['$http', functi
         return promise;
     }
 
+    this.unassignTags = function(photosUpdateSpec) {
+
+        var url = self.baseUrl + "unassignTags";
+
+        var promise = $http.get(url, {
+            params: { photosUpdateSpec: photosUpdateSpec }
+        });
+        return promise;
+    }
+
 }]);
 

@@ -115,6 +115,40 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
         return selectedPhotos;
     };
 
+    $scope.untagPhotos = function() {
+
+        // get the photos that the user has selected
+        var selectedPhotos = $scope.getCurrentSelection();
+
+        var photosUpdateSpec = [];
+        selectedPhotos.forEach(function(selectedPhoto) {
+
+            var indexOfTag = selectedPhoto.dbPhoto.tags.indexOf($scope.selectedTag);
+            if (indexOfTag < 0) {
+                console.log(selectedPhoto.title + " doesn't contains the tag " + $scope.selectedTag);
+            }
+            else {
+
+                // remove tag from tags array
+                photoUpdate = {};
+
+                photoUpdate.id = selectedPhoto.dbPhoto.id;
+                photoUpdate.tags = selectedPhoto.dbPhoto.tags;
+
+                //// note - this probably causes the local selectedPhoto to get updated as well (CONFIRMED - IT DOES!)
+                photoUpdate.tags.splice(indexOfTag, 1);
+
+                photosUpdateSpec.push(photoUpdate);
+
+                var unassignTagsPromise = $shafferotoServerService.unassignTags(photosUpdateSpec);
+                unassignTagsPromise.then(function (result) {
+                    console.log("unassignTags successful");
+                });
+            }
+        });
+
+    };
+
     $scope.tagPhotos = function() {
 
         // get the photos that the user has selected
@@ -139,14 +173,14 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
                 photoUpdate.id = selectedPhoto.dbPhoto.id;
                 photoUpdate.tags = selectedPhoto.dbPhoto.tags;
-                // note - this probably causes the local selectedPhoto to get updated as well
+                // note - this probably causes the local selectedPhoto to get updated as well (CONFIRMED - IT DOES!)
                 photoUpdate.tags.push($scope.selectedTag);
 
                 photosUpdateSpec.push(photoUpdate);
 
                 var assignTagsPromise = $shafferotoServerService.assignTags(photosUpdateSpec);
                 assignTagsPromise.then(function (result) {
-                    console.log("getPhotos successful");
+                    console.log("assignTags successful");
                 });
 
                 //selectedPhoto.dbPhoto.tags.push($scope.selectedTag);

@@ -76,13 +76,21 @@ app.get('/assignTags', function (req, res) {
 
   console.log("assignTags invoked");
 
-  dbController.assignTags(photosUpdateSpec);
+  dbController.updateTags(photosUpdateSpec);
   res.send("tags assigned");
+});
 
-  //var assignTagsPromise = dbController.assignTags(photosUpdateSpec);
-  //assignTagsPromise.then(function() {
-  //  res.send("tags assigned");
-  //});
+
+app.get('/unassignTags', function (req, res) {
+
+  res.set('Access-Control-Allow-Origin', '*');
+
+  var photosUpdateSpec = req.query.photosUpdateSpec;
+
+  console.log("unassignTags invoked");
+
+  dbController.updateTags(photosUpdateSpec);
+  res.send("tags unassigned");
 });
 
 

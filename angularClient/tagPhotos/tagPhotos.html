@@ -1,13 +1,13 @@
  <div style="position: fixed; top: 60px; z-index: 69;">
-        <label>Tags:</label>
+        <label>Select tag:</label>
         <select name="tags" id="tags" ng-model="selectedTag">
             <option ng-repeat="tag in tags" value="{{tag}}">{{tag}}</option>
         </select>
         <button ng-click="tagPhotos();">
             Tag Photos
         </button>
-        <button ng-click="getCurrentSelection();">
-            Selection
+        <button ng-click="untagPhotos();">
+            Untag Photos
         </button>
 </div>
 
