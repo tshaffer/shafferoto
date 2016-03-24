@@ -139,13 +139,13 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
                 photosUpdateSpec.push(photoUpdate);
 
-                var unassignTagsPromise = $shafferotoServerService.updateTags(photosUpdateSpec);
-                unassignTagsPromise.then(function (result) {
-                    console.log("unassignTags successful");
-                });
             }
         });
 
+        var unassignTagsPromise = $shafferotoServerService.updateTags(photosUpdateSpec);
+        unassignTagsPromise.then(function (result) {
+            console.log("unassignTags successful");
+        });
     };
 
     $scope.tagPhotos = function() {
@@ -176,12 +176,12 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
                 photoUpdate.tags.push($scope.selectedTag);
 
                 photosUpdateSpec.push(photoUpdate);
-
-                var assignTagsPromise = $shafferotoServerService.updateTags(photosUpdateSpec);
-                assignTagsPromise.then(function (result) {
-                    console.log("assignTags successful");
-                });
             }
+        });
+
+        var assignTagsPromise = $shafferotoServerService.updateTags(photosUpdateSpec);
+        assignTagsPromise.then(function (result) {
+            console.log("assignTags successful");
         });
     };
 }]);
