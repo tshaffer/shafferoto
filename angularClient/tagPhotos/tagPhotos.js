@@ -115,42 +115,52 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
         return selectedPhotos;
     };
 
+    $scope.isTagMissingFromPhoto = function(indexOfTag) {
+        return indexOfTag < 0;
+    }
+
+    $scope.addTagToPhoto = function(photoToUpdate, indexOfTag) {
+        photoToUpdate.tags.push($scope.selectedTag);
+    }
+
     $scope.getAssignTagPhotoToUpdate = function(photo) {
 
-        var photoToUpdate = null;
-
-        if (photo.dbPhoto.tags.indexOf($scope.selectedTag) >= 0)  {
-            console.log(photo.title + " already contains the tag " + $scope.selectedTag);
-        }
-        else {
-
-            photoToUpdate = {};
-
-            photoToUpdate.id = photo.dbPhoto.id;
-            photoToUpdate.tags = photo.dbPhoto.tags;
-            photoToUpdate.tags.push($scope.selectedTag);
-        }
-
+        var photoToUpdate = $scope.getPhotoToUpdate(photo, $scope.isTagMissingFromPhoto, $scope.addTagToPhoto);
         return photoToUpdate;
     };
 
+    $scope.isTagPresentInPhoto = function(indexOfTag) {
+        return indexOfTag >= 0;
+    }
+
+    $scope.removeTagFromPhoto = function(photoToUpdate, indexOfTag) {
+        photoToUpdate.tags.splice(indexOfTag, 1);
+    }
+
     $scope.getUnassignTagPhotoToUpdate = function(photo) {
+
+        var photoToUpdate = $scope.getPhotoToUpdate(photo, $scope.isTagPresentInPhoto, $scope.removeTagFromPhoto);
+        return photoToUpdate;
+    };
+
+    $scope.getPhotoToUpdate = function(photo, performActionOnPhoto, executeActionOnPhoto) {
+
+        var indexOfTag = photo.dbPhoto.tags.indexOf($scope.selectedTag);
 
         var photoToUpdate = null;
 
-        var indexOfTag = photo.dbPhoto.tags.indexOf($scope.selectedTag);
-        if (indexOfTag < 0) {
-            console.log(photo.title + " doesn't contains the tag " + $scope.selectedTag);
-        }
-        else {
-            // remove tag from tags array
+        if (performActionOnPhoto(indexOfTag)) {
+
             photoToUpdate = {};
 
             photoToUpdate.id = photo.dbPhoto.id;
             photoToUpdate.tags = photo.dbPhoto.tags;
-            photoToUpdate.tags.splice(indexOfTag, 1);
+
+            executeActionOnPhoto(photoToUpdate, indexOfTag);
         }
-    };
+
+        return photoToUpdate;
+    }
 
     $scope.getPhotosToUpdate = function(getPhotoToUpdate) {
 
@@ -174,7 +184,6 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
         updateTagsPromise.then(function (result) {
             console.log("updateTags successful");
         });
-
     };
     
     $scope.untagPhotos = function() {
