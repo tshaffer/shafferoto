@@ -167,7 +167,8 @@ function buildThumb(photo) {
       src: photo.filePath,
       dst: thumbPathName,
       width: targetWidth,
-      height: targetHeight
+      height: targetHeight,
+      quality: 75
     });
     createThumbPromise.then(function (image) {
       // image is the object returned from easyimage
