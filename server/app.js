@@ -35,7 +35,6 @@ app.get('/getPhotos', function(req, res) {
     response.photos = allPhotos;
     res.send(response);
   });
-
 });
 
 
@@ -112,35 +111,8 @@ app.get('/updateDB', function(req, res) {
           var buildThumbnailsPromise = buildThumbnails(photos);
           buildThumbnailsPromise.then(function(obj) {
             console.log("thumbnails build complete");
+            dbController.savePhotosToDB(photos);
           });
-
-          //photos.forEach(function(photo) {
-          //  console.log("create thumb for photo");
-          //
-          //  //dateTaken:2013-10-19T21:02:52.183Z
-          //  //filePath:"/Users/tedshaffer/Documents/Projects/shafferoto/server/public/testPhotos/Tahoe/p... (length: 93)"
-          //  //imageHeight:2448
-          //  //imageWidth:3264
-          //  //orientation:3
-          //  //title:"photo (10).JPG"
-          //  //url:"testPhotos/Tahoe/photo (10).JPG"
-          //
-          //  var targetHeight = 250;
-          //  var heightRatio = photo.imageHeight / targetHeight;
-          //  var targetWidth = photo.imageWidth / (photo.imageHeight / targetHeight);
-          //
-          //  var createThumbPromise = easyImage.resize({
-          //    src: photo.filePath,
-          //    dst: "foo.jpg",
-          //    width: targetWidth,
-          //    height: targetHeight
-          //  });
-          //  createThumbPromise.then(function (image) {
-          //    console.log("created thumbnail");
-          //  });
-          //});
-          //
-          ////dbController.savePhotosToDB(photos);
         });
       }
     }
@@ -163,7 +135,6 @@ function buildThumbnails(photos) {
       sequence = sequence.then(function() {
         return buildThumb(photo);
       }).then(function(photo) {
-        //photosWithExifData.push(photo);
         photoCount--;
         console.log("photoCount=" + photoCount);
         if (photoCount == 0) {
@@ -180,7 +151,6 @@ function buildThumb(photo) {
   return new Promise(function(resolve, reject) {
 
     var targetHeight = 250;
-    //var heightRatio = photo.imageHeight / targetHeight;
     var targetWidth = photo.imageWidth / (photo.imageHeight / targetHeight);
 
     var dirName = path.dirname(photo.filePath);
@@ -190,6 +160,9 @@ function buildThumb(photo) {
     var thumbFileName = fileName.substring(0,fileName.length - ext.length)+"_thumb" + ext;
     var thumbPathName = path.join(dirName,thumbFileName);
 
+    // photo is the object that is stored in the db
+    photo.thumbUrl = path.relative(photosDir, thumbPathName);
+
     var createThumbPromise = easyImage.resize({
       src: photo.filePath,
       dst: thumbPathName,
@@ -197,80 +170,12 @@ function buildThumb(photo) {
       height: targetHeight
     });
     createThumbPromise.then(function (image) {
-      console.log("created thumbnail");
+      // image is the object returned from easyimage
+      console.log("created thumbnail " + image.name);
       resolve(image);
     });
   });
 }
-
-//app.get('/updateDB', function(req, res) {
-//
-//  console.log("updateDB invoked");
-//  res.set('Access-Control-Allow-Origin', '*');
-//
-//  // retrieve photos that exist in db; get them in a hash table
-//  var hashAllPhotosPromise = dbController.hashAllPhotos();
-//  hashAllPhotosPromise.then(function(photosInDB) {
-//
-//    console.log('Look for photos in ' + photosDir);
-//    var photosOnDrive = [];
-//    photosOnDrive = findPhotos(photosDir, photosOnDrive);
-//
-//    if (photosOnDrive.length > 0) {
-//
-//      // look for photosOnDrive that aren't in photosInDB
-//      var photosToAdd = [];
-//      photosOnDrive.forEach(function (photoOnDrive) {
-//        if (!photosInDB.hasOwnProperty(photoOnDrive.url)) {
-//          photosToAdd.push(photoOnDrive);
-//        }
-//      });
-//
-//      if (photosToAdd.length <= 0) {
-//      }
-//      else {
-//        var photo = photosToAdd[0];
-//        var filePath = photo.filePath;
-//        var getInfoPromise = easyImage.info(filePath);
-//        getInfoPromise.then(function (photoInfo) {
-//          console.log("returned from easyImage");
-//
-//          var height = photoInfo.height;
-//          var width = photoInfo.width;
-//
-//          var ratio = height / width;
-//
-//          var heightRatio = height / 250;
-//
-//          var targetWidth = width / (height / 250);
-//          var targetHeight = 250;
-//
-//          var createThumbPromise = easyImage.resize({
-//            src: filePath,
-//            dst: "foo.jpg",
-//            width: targetWidth,
-//            height: targetHeight
-//          });
-//          createThumbPromise.then(function (image) {
-//            console.log("created thumbnail");
-//          });
-//
-//          //easyimg.resize({src:srcimg, dst: __dirname + '/output/resize.jpg', width:640, height:400}).then(function (file) {});
-//
-//          //var getExifDataPromise = exifReader.getAllExifData(photosToAdd);
-//          //getExifDataPromise.then(function(photos) {
-//          //  console.log("getExifDataPromised resolved");
-//          //
-//          //
-//          //  dbController.savePhotosToDB(photos);
-//          //});
-//        });
-//      }
-//
-//      res.send("ok");
-//    }
-//  });
-//});
 
 app.get('/getTaggedPhotos', function(req, res) {
   console.log("specified tag is " + req.query.tag);
@@ -294,33 +199,36 @@ function findPhotos(dir, photoFiles) {
       photoFiles = findPhotos(dir + '/' + file, photoFiles);
     }
     else {
-      // save it if it's a photo file
+      // save it if it's a photo file but not if it's a thumbnail
       photoFileSuffixes.forEach(function(suffix) {
         if (file.toLowerCase().endsWith(suffix)) {
+          var thumbSuffix = "_thumb." + suffix;
+          if (!file.toLowerCase().endsWith(thumbSuffix)) {
+            var photo = {};
+            photo.title = file;
 
-          var photo = {};
-          photo.title = file;
+            var filePath = path.format({
+              root: "/",
+              dir: dir,
+              base: file,
+              ext: "." + suffix,
+              name: "file"
+            });
+            photo.url = path.relative(photosDir, filePath);
+            photo.filePath = filePath;
+            photo.dateTaken = Date.now();
+            photo.orientation = 1;
 
-          var filePath = path.format({
-            root: "/",
-            dir: dir,
-            base: file,
-            ext: "." + suffix,
-            name: "file"
-          });
-          photo.url = path.relative(photosDir, filePath);
-          photo.filePath = filePath;
-          photo.dateTaken = Date.now();
-          photo.orientation = 1;
+            photoFiles.push(photo);
 
-          photoFiles.push(photo);
+            // code that gets sha1
+            //fs.readFile(filePath, function (err, data) {
+            //  console.log("File read complete");
+            //  var sha1 = sha1(data);
+            //  console.log(foo);
+            //});
 
-          // code that gets sha1
-          //fs.readFile(filePath, function (err, data) {
-          //  console.log("File read complete");
-          //  var sha1 = sha1(data);
-          //  console.log(foo);
-          //});
+          }
         }
       });
     }

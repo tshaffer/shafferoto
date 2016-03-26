@@ -13,6 +13,7 @@ var photoSchema = new Schema({
     imageWidth: Number,
     imageHeight: Number,
     tags: [String],
+    thumbUrl: String,
     comments: [{ body: String, date: Date }],
 });
 var Photo = mongoose.model('Photo', photoSchema);
@@ -57,7 +58,7 @@ function fetchAllPhotos() {
 
                 photos = [];
                 photoDocs.forEach(function (photoDoc) {
-                    photos.push({id: photoDoc.id, title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation, width: photoDoc.imageWidth, height: photoDoc.imageHeight, tags: photoDoc.tags });
+                    photos.push({id: photoDoc.id, title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation, width: photoDoc.imageWidth, height: photoDoc.imageHeight, thumbUrl: photoDoc.thumbUrl, tags: photoDoc.tags });
                 });
 
                 resolve(photos);
@@ -109,7 +110,8 @@ function savePhotosToDB(photos) {
             dateTaken: photo.dateTaken,
             orientation: photo.orientation,
             imageWidth: photo.imageWidth,
-            imageHeight: photo.imageHeight
+            imageHeight: photo.imageHeight,
+            thumbUrl: photo.thumbUrl
         });
 
         photoForDB.save(function (err) {
