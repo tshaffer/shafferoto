@@ -3,6 +3,7 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
     var numColumns = 4;
 
     $scope.photos = [];
+    $scope.imagesById = {};
 
     var photoTemplate = "";
     photoTemplate  = "<div><div class='ui-grid-cell-contents'>";
@@ -72,6 +73,8 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
             // TODO - doing this for expediency - best design?
             image.dbPhoto = dbPhoto;
+
+            $scope.imagesById[dbPhoto.id] = image;
 
             var key = "image" + columnIndex.toString();
             photo[key] = image;
@@ -182,12 +185,37 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
     $scope.updateTags = function(photosUpdateSpec) {
 
+        // hack
+        $scope.photosUpdateSpec = photosUpdateSpec;
+
         var updateTagsPromise = $shafferotoServerService.updateTags(photosUpdateSpec);
+
+        // the following didn't work
+        //updateTagsComplete.bind(photosUpdateSpec);
+
         updateTagsPromise.then(function (result) {
+
+            // didn't work
+            //updateTagsComplete();
+
             console.log("updateTags successful");
+
+            $scope.photosUpdateSpec.forEach(function(photoToUpdate) {
+                var image = $scope.imagesById[photoToUpdate.id];
+                image.tagList = "";
+                photoToUpdate.tags.forEach(function(tag) {
+                   image.tagList += tag + ", ";
+                });
+                image.tagList = image.tagList.substring(0, image.tagList.length - 2);
+            });
         });
     };
-    
+
+    // didn't work
+    //var updateTagsComplete = function() {
+    //    // this === photosUpdateSpec
+    //};
+
     $scope.untagPhotos = function() {
 
         var photosUpdateSpec = $scope.getPhotosToUpdate($scope.getUnassignTagPhotoToUpdate);
