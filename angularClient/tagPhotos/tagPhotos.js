@@ -6,7 +6,8 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
     var photoTemplate = "";
     photoTemplate  = "<div><div class='ui-grid-cell-contents'>";
-    photoTemplate += "<img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" height='{{grid.getCellValue(row, col).height}}' width='{{grid.getCellValue(row, col).width}}' ng-src=\"{{grid.getCellValue(row, col).url}}\">";
+    //photoTemplate += "<img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" height='{{grid.getCellValue(row, col).height}}' width='{{grid.getCellValue(row, col).width}}' ng-src=\"{{grid.getCellValue(row, col).url}}\">";
+    photoTemplate += "<img ng-src=\"{{grid.getCellValue(row, col).thumbUrl}}\">";
     photoTemplate += "</div>";
 
     photoTemplate += "<div><p class='centerText'>{{grid.getCellValue(row, col).tagList}}</p></div>";
@@ -48,6 +49,7 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
             var image = {};
             image.url = baseUrl + dbPhoto.url;
+            image.thumbUrl = baseUrl + dbPhoto.thumbUrl;
             image.orientation = dbPhoto.orientation;
             image.title = dbPhoto.title;
 
