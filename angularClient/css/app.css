@@ -1,9 +1,21 @@
-.smallButton {
+.smallFont {
 	font-size: small;
 }
-
-.mediumButton {
+.mediumFont {
 	font-size: medium;
+}
+.largeFont {
+	font-size: large;
+}
+
+.radioButtonLeft {
+    margin: 0px 24px 0px 6px;
+}
+.radioButtonRight {
+    margin: 0px 6px 0px 24px;
+}
+.radioButtonInner {
+    margin: 0px 24px 0px 24px;
 }
 
 .rotate90 {

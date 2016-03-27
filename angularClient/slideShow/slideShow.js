@@ -2,6 +2,7 @@ angular.module('shafferoto').controller('slideShow', ['$scope', 'shafferotoServe
 
     $scope.tags = [];
     $scope.tagsInQuery = [];
+    $scope.dateQueryType = "none";
 
     var getTagsPromise = $shafferotoServerService.getTags();
     getTagsPromise.then(function (result) {

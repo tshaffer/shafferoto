@@ -2,45 +2,53 @@
 <h2>Build Query</h2>
 
 <div>
-    <h4>Tags in query</h4>
+    <h4>Tags</h4>
     <ul >
         <div ng-repeat="tagInQuery in tagsInQuery">
             <select name="tags" id="tags" ng-model="tagInQuery.tag" ng-options="tag for tag in tags"></select>
-            <button ng-click="deleteTagFromQuery($index)" class="smallButton">Delete</button>
+            <button ng-click="deleteTagFromQuery($index)" class="smallFont">Delete</button>
         </div>
     </ul>
 </div>
 
 <div id="addTagToQueryDiv">
-    <button ng-click="addTagToQuery()" class="smallButton">Add tag to query</button>
+    <button ng-click="addTagToQuery()" class="smallFont">Add tag to query</button>
 </div>
 
 <br>
 
 <div>
-    <label>
-        <input type="radio" ng-model="dateQueryType" value="Before">
-        Before a date
+    <h4>Date spec</h4>
+</div>
+
+<div>
+    <label class="smallFont">
+        <input type="radio" ng-model="dateQueryType" style="margin: 0px 6px 0px 0px;" value="none">None
     </label>
-    <label>
-        <input type="radio" ng-model="dateQueryType" value="Before">
-        After a date
+
+    <label class="smallFont">
+        <input type="radio" ng-model="dateQueryType" style="margin: 0px 6px 0px 16px;" value="before">Before a date
     </label>
-    <label>
-        <input type="radio" ng-model="dateQueryType" value="Before">
-        On a date
+
+    <label class="smallFont">
+        <input type="radio" ng-model="dateQueryType" style="margin: 0px 6px 0px 16px;" value="after">After a date
     </label>
-    <label>
-        <input type="radio" ng-model="dateQueryType" value="Before">
-        Between two dates
+
+    <label class="smallFont">
+        <input type="radio" ng-model="dateQueryType" style="margin: 0px 6px 0px 16px;" value="on">On a date
     </label>
+
+    <label class="smallFont">
+        <input type="radio" ng-model="dateQueryType" style="margin: 0px 6px 0px 16px;" value="between">Between two dates
+    </label>
+
 </div>
 
 <br>
 
 <div>
-    <button ng-click="addDate()" class="smallButton">Add date</button>
-    <button ng-click="addDateRange()" class="smallButton">Add date range</button>
+    <button ng-click="addDate()" class="smallFont">Add date</button>
+    <button ng-click="addDateRange()" class="smallFont">Add date range</button>
 </div>
 
 
@@ -48,13 +56,13 @@
 <br>
 
 <div id="loadQuery">
-    <button ng-click="loadQuery()" class="mediumButton">Load query</button>
+    <button ng-click="loadQuery()" class="mediumFont">Load query</button>
 </div>
 
 <br>
 
 <div id="saveQuery">
-    <button ng-click="saveQuery()" class="mediumButton">Save query</button>
+    <button ng-click="saveQuery()" class="mediumFont">Save query</button>
 </div>
 
 <br>
