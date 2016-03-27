@@ -1,3 +1,11 @@
+.smallButton {
+	font-size: small;
+}
+
+.mediumButton {
+	font-size: medium;
+}
+
 .rotate90 {
 	-webkit-transform: rotate(90deg);
 }

@@ -185,22 +185,14 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
     $scope.updateTags = function(photosUpdateSpec) {
 
-        // hack
-        $scope.photosUpdateSpec = photosUpdateSpec;
+        var self = this;
+        self.photosUpdateSpec = photosUpdateSpec;
 
         var updateTagsPromise = $shafferotoServerService.updateTags(photosUpdateSpec);
 
-        // the following didn't work
-        //updateTagsComplete.bind(photosUpdateSpec);
-
         updateTagsPromise.then(function (result) {
 
-            // didn't work
-            //updateTagsComplete();
-
-            console.log("updateTags successful");
-
-            $scope.photosUpdateSpec.forEach(function(photoToUpdate) {
+            self.photosUpdateSpec.forEach(function(photoToUpdate) {
                 var image = $scope.imagesById[photoToUpdate.id];
                 image.tagList = "";
                 photoToUpdate.tags.forEach(function(tag) {
@@ -210,11 +202,6 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
             });
         });
     };
-
-    // didn't work
-    //var updateTagsComplete = function() {
-    //    // this === photosUpdateSpec
-    //};
 
     $scope.untagPhotos = function() {
 

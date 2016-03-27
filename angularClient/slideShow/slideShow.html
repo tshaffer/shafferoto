@@ -1,1 +1,64 @@
 <h1>Slide Shows</h1>
+<h2>Build Query</h2>
+
+<div>
+    <h4>Tags in query</h4>
+    <ul >
+        <div ng-repeat="tagInQuery in tagsInQuery">
+            <select name="tags" id="tags" ng-model="tagInQuery.tag" ng-options="tag for tag in tags"></select>
+            <button ng-click="deleteTagFromQuery($index)" class="smallButton">Delete</button>
+        </div>
+    </ul>
+</div>
+
+<div id="addTagToQueryDiv">
+    <button ng-click="addTagToQuery()" class="smallButton">Add tag to query</button>
+</div>
+
+<br>
+
+<div>
+    <label>
+        <input type="radio" ng-model="dateQueryType" value="Before">
+        Before a date
+    </label>
+    <label>
+        <input type="radio" ng-model="dateQueryType" value="Before">
+        After a date
+    </label>
+    <label>
+        <input type="radio" ng-model="dateQueryType" value="Before">
+        On a date
+    </label>
+    <label>
+        <input type="radio" ng-model="dateQueryType" value="Before">
+        Between two dates
+    </label>
+</div>
+
+<br>
+
+<div>
+    <button ng-click="addDate()" class="smallButton">Add date</button>
+    <button ng-click="addDateRange()" class="smallButton">Add date range</button>
+</div>
+
+
+<br>
+<br>
+
+<div id="loadQuery">
+    <button ng-click="loadQuery()" class="mediumButton">Load query</button>
+</div>
+
+<br>
+
+<div id="saveQuery">
+    <button ng-click="saveQuery()" class="mediumButton">Save query</button>
+</div>
+
+<br>
+
+<div id="launchSlideShow">
+    <button ng-click="launchSlideShow()">Launch Slide Show</button>
+</div>
