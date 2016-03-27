@@ -44,10 +44,27 @@
 
 </div>
 
-<div id="onDateDiv" ng-show="dateTypeIsOn()">
-    <input class="smallFont" type="date" id="singleDate"  ng-model="dateValue" value="dateValue">
+<div id="beforeDateDiv" ng-show="dateQueryType == 'before'" >
+    <span style="display: inline-block; font-size: small; width: 40px;">Before</span>
+    <input class="smallFont" type="date" id="beforeDate" style="width: 130px;" ng-model="dateValue" value="dateValue">
 </div>
 
+<div id="afterDateDiv" ng-show="dateQueryType == 'after'">
+    <span style="display: inline-block; font-size: small; width: 40px;">After</span>
+    <input class="smallFont" type="date" id="afterDate" style="width: 130px;" ng-model="dateValue" value="dateValue">
+</div>
+
+<div id="onDateDiv" ng-show="dateQueryType == 'on'">
+    <span style="display: inline-block; font-size: small; width: 40px;">On</span>
+    <input class="smallFont" type="date" id="onDate" style="width: 130px;" ng-model="dateValue" value="dateValue">
+</div>
+
+<div id="betweenDateDiv" ng-show="dateQueryType == 'between'">
+    <span style="display: inline-block; font-size: small;">Between</span>
+    <input class="smallFont" type="date" id="startDate"  style="width: 130px;" ng-model="startDateValue" value="startDateValue">
+    <span style="display: inline-block; font-size: small;">and</span>
+    <input class="smallFont" type="date" id="endDate" style="width: 130px;" ng-model="endDateValue" value="endDateValue">
+</div>
 
 <br>
 
