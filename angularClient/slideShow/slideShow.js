@@ -3,6 +3,7 @@ angular.module('shafferoto').controller('slideShow', ['$scope', 'shafferotoServe
     $scope.tags = [];
     $scope.tagsInQuery = [];
     $scope.dateQueryType = "none";
+    $scope.dateValue = new Date();
 
     var getTagsPromise = $shafferotoServerService.getTags();
     getTagsPromise.then(function (result) {
@@ -25,5 +26,9 @@ angular.module('shafferoto').controller('slideShow', ['$scope', 'shafferotoServe
     $scope.saveQuery = function() {
         console.log("pizza");
     };
+
+    $scope.dateTypeIsOn = function() {
+        return $scope.dateQueryType == "on";
+    }
 
 }]);
