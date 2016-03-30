@@ -1,5 +1,9 @@
 angular.module('shafferoto').controller('slideShow', ['$scope', 'shafferotoServerService', function($scope, $shafferotoServerService ) {
 
+    $scope.images = [];
+    $scope.slideShowVisible = false;
+    $scope.slideShowSpecVisible = true;
+
     $scope.tags = [];
     $scope.tagsInQuery = [];
     $scope.dateQueryType = "none";
@@ -27,12 +31,32 @@ angular.module('shafferoto').controller('slideShow', ['$scope', 'shafferotoServe
         $scope.tagsInQuery.splice(index, 1);
     }
 
-    $scope.saveQuery = function() {
-        console.log("pizza");
+    $scope.loadQuery = function() {
+        console.log("load query");
     };
 
-    $scope.dateTypeIsOn = function() {
-        return $scope.dateQueryType == "on";
-    }
+    $scope.saveQuery = function() {
+        console.log("save query");
+    };
 
+    $scope.launchSlideShow = function() {
+        console.log("launchSlideShow");
+
+        var getPhotosPromise = $shafferotoServerService.getPhotos();
+        getPhotosPromise.then(function (result) {
+            console.log("getPhotos successful");
+
+            var baseUrl = $shafferotoServerService.getBaseUrl() +  "photos/";
+
+            result.data.photos.forEach(function(photo){
+                var url = baseUrl + photo.url;
+                $scope.images.push( { src: url, title: photo.title, orientation: photo.orientation, visible: false } );
+            });
+
+            $scope.$broadcast("imagesInitialized");
+
+            $scope.slideShowSpecVisible = false;
+            $scope.slideShowVisible = true;
+        })
+    };
 }]);

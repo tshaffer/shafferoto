@@ -1,11 +1,14 @@
-<div class="slider">
-	<div class="slide" ng-repeat="image in images" ng-show="image.visible">
-		<div style="position:fixed; height: 100%; width: 100%; top:0;left: 0;">
+<div class="slider" style="visibility: collapse">
+	<div class="slide" ng-repeat="image in images" ng-show="image.visible && imagesInitialized">
+	<!--<div class="slide" ng-repeat="image in images" style="visibility: collapse">-->
+		<!--<div style="position:fixed; height: 100%; width: 100%; top:0;left: 0;">-->
+		<div style="position:fixed; height: 100%; width: 100%; top:130px;left: 0;">
 			<p>{{image.title}}</p>
 			<img ng-src="{{image.src}}" style="height: 100%;" ng-class="{ rotate90: image.orientation==6, rotate180: image.orientation==3 }" />
 		</div>
 	</div>
 	<div class="arrows">
-		<a href="#" ng-click="prev()"><img src="img/left-arrow.png"/></a> <a href="#" ng-click="next()"><img src="img/right-arrow.png"/></a>
+		<!--<a href="#" ng-click="prev()"><img src="img/left-arrow.png"/></a> <a href="#" ng-click="next()"><img src="img/right-arrow.png"/></a>-->
+		<button ng-click="next()">next</button>
 	</div>
 </div>

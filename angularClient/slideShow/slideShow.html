@@ -1,94 +1,99 @@
-<h1>Slide Shows</h1>
-<h2>Build Query</h2>
 
-<div>
-    <h4>Tags</h4>
-    <ul >
-        <div ng-repeat="tagInQuery in tagsInQuery">
-            <select name="tags" id="tags" ng-model="tagInQuery.tag" ng-options="tag for tag in tags"></select>
-            <button ng-click="deleteTagFromQuery($index)" class="smallFont">Delete</button>
-        </div>
-    </ul>
-</div>
+<slider id="slider" images="images" ng-show="slideShowVisible"/>
 
-<div id="addTagToQueryDiv">
-    <button ng-click="addTagToQuery()" class="smallFont">Add tag to query</button>
-</div>
+<div id="slideShowSpec" ng-show="slideShowSpecVisible">
 
-<br>
+    <h1>Slide Shows</h1>
+    <h2>Build Query</h2>
 
-<div>
-    <h4>Date spec</h4>
-</div>
+    <div>
+        <h4>Tags</h4>
+        <ul>
+            <div ng-repeat="tagInQuery in tagsInQuery">
+                <select name="tags" id="tags" ng-model="tagInQuery.tag" ng-options="tag for tag in tags"></select>
+                <button ng-click="deleteTagFromQuery($index)" class="smallFont">Delete</button>
+            </div>
+        </ul>
+    </div>
 
-<div>
-    <label class="smallFont">
-        <input type="radio" ng-model="dateQueryType" style="margin: 0px 6px 0px 0px;" value="none">None
-    </label>
+    <div id="addTagToQueryDiv">
+        <button ng-click="addTagToQuery()" class="smallFont">Add tag to query</button>
+    </div>
 
-    <label class="smallFont">
-        <input type="radio" ng-model="dateQueryType" style="margin: 0px 6px 0px 16px;" value="before">Before a date
-    </label>
+    <br>
 
-    <label class="smallFont">
-        <input type="radio" ng-model="dateQueryType" style="margin: 0px 6px 0px 16px;" value="after">After a date
-    </label>
+    <div>
+        <h4>Date spec</h4>
+    </div>
 
-    <label class="smallFont">
-        <input type="radio" ng-model="dateQueryType" style="margin: 0px 6px 0px 16px;" value="on">On a date
-    </label>
+    <div>
+        <label class="smallFont">
+            <input type="radio" ng-model="dateQueryType" style="margin: 0px 6px 0px 0px;" value="none">None
+        </label>
 
-    <label class="smallFont">
-        <input type="radio" ng-model="dateQueryType" style="margin: 0px 6px 0px 16px;" value="between">Between two dates
-    </label>
+        <label class="smallFont">
+            <input type="radio" ng-model="dateQueryType" style="margin: 0px 6px 0px 16px;" value="before">Before a date
+        </label>
 
-</div>
+        <label class="smallFont">
+            <input type="radio" ng-model="dateQueryType" style="margin: 0px 6px 0px 16px;" value="after">After a date
+        </label>
 
-<div id="beforeDateDiv" ng-show="dateQueryType == 'before'" >
-    <span style="display: inline-block; font-size: small; width: 40px;">Before</span>
-    <input class="smallFont" type="date" id="beforeDate" style="width: 130px;" ng-model="dateValue" value="dateValue">
-</div>
+        <label class="smallFont">
+            <input type="radio" ng-model="dateQueryType" style="margin: 0px 6px 0px 16px;" value="on">On a date
+        </label>
 
-<div id="afterDateDiv" ng-show="dateQueryType == 'after'">
-    <span style="display: inline-block; font-size: small; width: 40px;">After</span>
-    <input class="smallFont" type="date" id="afterDate" style="width: 130px;" ng-model="dateValue" value="dateValue">
-</div>
+        <label class="smallFont">
+            <input type="radio" ng-model="dateQueryType" style="margin: 0px 6px 0px 16px;" value="between">Between two
+            dates
+        </label>
 
-<div id="onDateDiv" ng-show="dateQueryType == 'on'">
-    <span style="display: inline-block; font-size: small; width: 40px;">On</span>
-    <input class="smallFont" type="date" id="onDate" style="width: 130px;" ng-model="dateValue" value="dateValue">
-</div>
+    </div>
 
-<div id="betweenDateDiv" ng-show="dateQueryType == 'between'">
-    <span style="display: inline-block; font-size: small;">Between</span>
-    <input class="smallFont" type="date" id="startDate"  style="width: 130px;" ng-model="startDateValue" value="startDateValue">
-    <span style="display: inline-block; font-size: small;">and</span>
-    <input class="smallFont" type="date" id="endDate" style="width: 130px;" ng-model="endDateValue" value="endDateValue">
-</div>
+    <div id="beforeDateDiv" ng-show="dateQueryType == 'before'">
+        <span style="display: inline-block; font-size: small; width: 40px;">Before</span>
+        <input class="smallFont" type="date" id="beforeDate" style="width: 130px;" ng-model="dateValue"
+               value="dateValue">
+    </div>
 
-<br>
+    <div id="afterDateDiv" ng-show="dateQueryType == 'after'">
+        <span style="display: inline-block; font-size: small; width: 40px;">After</span>
+        <input class="smallFont" type="date" id="afterDate" style="width: 130px;" ng-model="dateValue"
+               value="dateValue">
+    </div>
 
-<div>
-    <button ng-click="addDate()" class="smallFont">Add date</button>
-    <button ng-click="addDateRange()" class="smallFont">Add date range</button>
-</div>
+    <div id="onDateDiv" ng-show="dateQueryType == 'on'">
+        <span style="display: inline-block; font-size: small; width: 40px;">On</span>
+        <input class="smallFont" type="date" id="onDate" style="width: 130px;" ng-model="dateValue" value="dateValue">
+    </div>
 
+    <div id="betweenDateDiv" ng-show="dateQueryType == 'between'">
+        <span style="display: inline-block; font-size: small;">Between</span>
+        <input class="smallFont" type="date" id="startDate" style="width: 130px;" ng-model="startDateValue"
+               value="startDateValue">
+        <span style="display: inline-block; font-size: small;">and</span>
+        <input class="smallFont" type="date" id="endDate" style="width: 130px;" ng-model="endDateValue"
+               value="endDateValue">
+    </div>
 
-<br>
-<br>
+    <br>
+    <br>
 
-<div id="loadQuery">
-    <button ng-click="loadQuery()" class="mediumFont">Load query</button>
-</div>
+    <div id="loadQuery">
+        <button ng-click="loadQuery()" class="mediumFont">Load query</button>
+    </div>
 
-<br>
+    <br>
 
-<div id="saveQuery">
-    <button ng-click="saveQuery()" class="mediumFont">Save query</button>
-</div>
+    <div id="saveQuery">
+        <button ng-click="saveQuery()" class="mediumFont">Save query as</button>
+        <input type="text" id="savedQueryName" ng-model="savedQueryName" style="width: 200px;" class="mediumFont">
+    </div>
 
-<br>
+    <br>
 
-<div id="launchSlideShow">
-    <button ng-click="launchSlideShow()">Launch Slide Show</button>
+    <div id="launchSlideShow">
+        <button ng-click="launchSlideShow()">Launch Slide Show</button>
+    </div>
+
 </div>
