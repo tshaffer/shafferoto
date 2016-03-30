@@ -71,6 +71,47 @@ function fetchAllPhotos() {
 }
 
 
+function queryPhotos(querySpecStr) {
+
+    return new Promise(function (resolve, reject) {
+
+        if (dbOpened) {
+
+            var querySpec = JSON.parse(querySpecStr);
+
+            if (typeof querySpec.tagsInQuery == "object" && Array.isArray(querySpec.tagsInQuery)) {
+
+                var tagsInQuery = [];
+                querySpec.tagsInQuery.forEach(function (tagInQuery) {
+                    tagsInQuery.push(tagInQuery.tag);
+                });
+
+                Photo.find( { tags: { $in: tagsInQuery } }, function(err, photoDocs) {
+                    if (err) {
+                        console.log("error returned from mongoose in queryPhotos");
+                        reject();
+                    }
+
+                    photos = [];
+                    photoDocs.forEach(function (photoDoc) {
+                        photos.push({id: photoDoc.id, title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation, width: photoDoc.imageWidth, height: photoDoc.imageHeight, thumbUrl: photoDoc.thumbUrl, tags: photoDoc.tags });
+                    });
+
+                    resolve(photos);
+                })
+            }
+            else {
+                debugger;
+            }
+        }
+        else {
+            reject();
+        }
+    });
+}
+
+
+
 function hashAllPhotos() {
 
     return new Promise(function (resolve, reject) {
@@ -211,5 +252,6 @@ module.exports = {
     savePhotosToDB: savePhotosToDB,
     fetchAllTags: fetchAllTags,
     addTagToDB: addTagToDB,
-    updateTags: updateTags
+    updateTags: updateTags,
+    queryPhotos: queryPhotos
 }

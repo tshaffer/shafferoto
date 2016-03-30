@@ -32,7 +32,25 @@ app.get('/getPhotos', function(req, res) {
   var fetchAllPhotosPromise = dbController.fetchAllPhotos();
   fetchAllPhotosPromise.then(function(allPhotos) {
     var response = {};
+    debugger;
     response.photos = allPhotos;
+    res.send(response);
+  });
+});
+
+
+app.get('/queryPhotos', function(req, res) {
+
+  res.set('Access-Control-Allow-Origin', '*');
+
+  var querySpec = req.query.querySpec;
+
+  console.log("queryPhotos invoked");
+
+  var queryPhotosPromise = dbController.queryPhotos(querySpec);
+  queryPhotosPromise.then(function(photos) {
+    var response = {};
+    response.photos = photos;
     res.send(response);
   });
 });
