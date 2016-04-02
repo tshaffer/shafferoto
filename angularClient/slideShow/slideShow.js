@@ -45,6 +45,8 @@ angular.module('shafferoto').controller('slideShow', ['$scope', 'shafferotoServe
 
         var querySpec = {};
         querySpec.tagsInQuery = $scope.tagsInQuery;
+        querySpec.tagQueryOperator = $scope.tagQueryOperator;
+
         querySpec.dateQueryType = $scope.dateQueryType;
         querySpec.dateValue = $scope.dateValue;
         querySpec.startDateValue = $scope.startDateValue;

@@ -49,7 +49,6 @@ function fetchAllPhotos() {
 
         if (dbOpened) {
 
-            //Photo.find( { tags: { $in: ["drinks"] } }, function(err, photoDocs) {
             Photo.find({}, function (err, photoDocs) {
                 if (err) {
                     console.log("error returned from mongoose query");
@@ -120,7 +119,12 @@ function queryPhotos(querySpecStr) {
                         tagsInQuery.push(tagInQuery.tag);
                     });
 
-                    tagsInQueryFragment.$in = tagsInQuery;
+                    if (querySpec.tagQueryOperator == 'or') {
+                        tagsInQueryFragment.$in = tagsInQuery;
+                    }
+                    else {
+                        tagsInQueryFragment.$all = tagsInQuery;
+                    }
                 }
                 else {
                     queryIncludesTags = false;
@@ -181,7 +185,6 @@ function hashAllPhotos() {
 
         if (dbOpened) {
 
-            //Photo.find( { tags: { $in: ["drinks"] } }, function(err, photoDocs) {
             Photo.find({}, function (err, photoDocs) {
                 if (err) {
                     console.log("error returned from mongoose query");
