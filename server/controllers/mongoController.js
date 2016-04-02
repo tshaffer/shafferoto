@@ -1,6 +1,7 @@
 var dbOpened = false;
 
 var mongoose = require('mongoose');
+require('datejs');
 
 var photos = [];
 
@@ -111,7 +112,14 @@ function queryPhotos(querySpecStr) {
                         dateTakenQueryFragment.$gt = new Date(querySpec.dateValue);
                         break;
                     case "on":
-                        dateTakenQueryFragment.$eq = new Date(querySpec.dateValue);
+                        var startDate = new Date(querySpec.dateValue);
+                        startDate.clearTime();
+
+                        var endDate = new Date(querySpec.dateValue);
+                        endDate.clearTime().addDays(1);
+
+                        dateTakenQueryFragment.$gt = startDate;
+                        dateTakenQueryFragment.$lt = endDate;
                         break;
                     case "between":
                         dateTakenQueryFragment.$gt = new Date(querySpec.startDateValue);
