@@ -77,16 +77,111 @@ function queryPhotos(querySpecStr) {
 
         if (dbOpened) {
 
+            // example query using dates
+            //Photo.find( { dateTaken: { $gt: new Date("Dec 30 2013") }}, function(err, photoDocs) {
+            //    if (err) {
+            //        console.log("error returned from mongoose in queryPhotos");
+            //        reject();
+            //    }
+            //
+            //    photos = [];
+            //    photoDocs.forEach(function (photoDoc) {
+            //        photos.push({id: photoDoc.id, title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation, width: photoDoc.imageWidth, height: photoDoc.imageHeight, thumbUrl: photoDoc.thumbUrl, tags: photoDoc.tags });
+            //    });
+            //
+            //    resolve(photos);
+            //})
+            //
+            //return;
+
             var querySpec = JSON.parse(querySpecStr);
 
             if (typeof querySpec.tagsInQuery == "object" && Array.isArray(querySpec.tagsInQuery)) {
 
-                var tagsInQuery = [];
-                querySpec.tagsInQuery.forEach(function (tagInQuery) {
-                    tagsInQuery.push(tagInQuery.tag);
-                });
+                var queryIncludesDateComponent = true;
+                var queryIncludesTags = true;
 
-                Photo.find( { tags: { $in: tagsInQuery } }, function(err, photoDocs) {
+                var dateQuerySnippet = "";
+                switch (querySpec.dateQueryType) {
+                    case "before":
+                        var specDate = new Date(querySpec.dateValue);
+                        //dateQuerySnippet = "{ 'dateTaken': { $lt : new Date('" + specDate + "')} }";
+                        dateQuerySnippet = "{ dateTaken: { $lt : new Date('" + specDate + "')} }";
+                        break;
+                    case "after":
+                        var specDate = new Date(querySpec.dateValue);
+                        dateQuerySnippet = "{ 'dateTaken': { $gt : specDate } }";
+                        break;
+                    case "on":
+                        var specDate = new Date(querySpec.dateValue);
+                        dateQuerySnippet = "{ 'dateTaken': { $eq : specDate } }";
+                        break;
+                    case "between":
+                        var startDate = new Date(querySpec.startDateValue);
+                        var endDate = new Date(querySpec.endDateValue);
+                        dateQuerySnippet = "{ 'dateTaken': { $gt : startDate } }, { 'dateTaken': { $lt : endDate } }";
+                        break;
+                    default:
+                        queryIncludesDateComponent = false;
+                        break;
+                }
+
+                //if (queryIncludesDateComponent) {
+                //    Photo.find( dateQuerySnippet, function(err, photoDocs) {
+                //        if (err) {
+                //            console.log("error returned from mongoose in queryPhotos");
+                //            reject();
+                //        }
+                //    });
+                //}
+
+                var tagQuerySnippet = "";
+                if (querySpec.tagsInQuery.length > 0) {
+
+                    var tagsInQuery = [];
+                    querySpec.tagsInQuery.forEach(function (tagInQuery) {
+                        tagsInQuery.push(tagInQuery.tag);
+                    });
+                    tagQuerySnippet = "{ tags: { $in: tagsInQuery } }";
+                }
+                else {
+                    queryIncludesTags = false;
+                }
+
+                //db.inventory.find( {
+                //    $and : [
+                //        { $or : [ { price : 0.99 }, { price : 1.99 } ] },
+                //        { $or : [ { sale : true }, { qty : { $lt : 20 } } ] }
+                //    ]
+                //} )
+
+                var photos = [];
+
+                var query = "";
+                if (queryIncludesDateComponent && queryIncludesTags) {
+                    query = "{ $and : [";
+                    query += dateQuerySnippet + ",";
+                    query += tagQuerySnippet;
+                    query += "] }";
+                }
+                else if (queryIncludesDateComponent) {
+                    query = dateQuerySnippet;
+                }
+                else if (queryIncludesTags) {
+                    query = tagQuerySnippet;
+                }
+                else {
+                    resolve(photos);
+                }
+
+                // these don't work
+                //query = "{ dateTaken: { $lt: new Date("Dec 30 2013") }}";
+                //query = "{ dateTaken: { $lt: new Date('Dec 30 2013') }}";
+                //Photo.find( { dateTaken: { $lt: new Date("Dec 30 2013") }}, function(err, photoDocs) {
+                //Photo.find( query, function(err, photoDocs) {
+
+                // this works
+                Photo.find( { dateTaken: { $lt: new Date(querySpec.dateValue) }}, function(err, photoDocs) {
                     if (err) {
                         console.log("error returned from mongoose in queryPhotos");
                         reject();
@@ -98,7 +193,22 @@ function queryPhotos(querySpecStr) {
                     });
 
                     resolve(photos);
-                })
+
+                });
+
+                //Photo.find( { tags: { $in: tagsInQuery } }, function(err, photoDocs) {
+                //    if (err) {
+                //        console.log("error returned from mongoose in queryPhotos");
+                //        reject();
+                //    }
+                //
+                //    photos = [];
+                //    photoDocs.forEach(function (photoDoc) {
+                //        photos.push({id: photoDoc.id, title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation, width: photoDoc.imageWidth, height: photoDoc.imageHeight, thumbUrl: photoDoc.thumbUrl, tags: photoDoc.tags });
+                //    });
+                //
+                //    resolve(photos);
+                //})
             }
             else {
                 debugger;

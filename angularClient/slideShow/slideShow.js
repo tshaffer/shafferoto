@@ -51,9 +51,20 @@ angular.module('shafferoto').controller('slideShow', ['$scope', 'shafferotoServe
 
         var queryPhotosPromise = $shafferotoServerService.queryPhotos(querySpec);
         queryPhotosPromise.then(function (result) {
-            result.data.photos.forEach(function(dbPhoto) {
-                debugger;
-            })
+
+            console.log("queryPhotos successful");
+
+            var baseUrl = $shafferotoServerService.getBaseUrl() +  "photos/";
+
+            result.data.photos.forEach(function(photo) {
+                var url = baseUrl + photo.url;
+                $scope.images.push( { src: url, title: photo.title, orientation: photo.orientation, visible: false } );
+            });
+
+            $scope.$broadcast("imagesInitialized");
+
+            $scope.slideShowSpecVisible = false;
+            $scope.slideShowVisible = true;
         });
 
         //var getPhotosPromise = $shafferotoServerService.getPhotos();
