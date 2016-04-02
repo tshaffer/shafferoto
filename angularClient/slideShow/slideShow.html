@@ -1,4 +1,3 @@
-
 <slider id="slider" images="images" ng-show="slideShowVisible"/>
 
 <div id="slideShowSpec" ng-show="slideShowSpecVisible">
@@ -7,23 +6,40 @@
     <h2>Build Query</h2>
 
     <div>
-        <h4>Tags</h4>
+        <h3>Tags</h3>
+
+        <div id="addTagToQueryDiv">
+            <button ng-click="addTagToQuery()" class="smallFont">Add tag to query</button>
+        </div>
+
         <ul>
             <div ng-repeat="tagInQuery in tagsInQuery">
                 <select name="tags" id="tags" ng-model="tagInQuery.tag" ng-options="tag for tag in tags"></select>
                 <button ng-click="deleteTagFromQuery($index)" class="smallFont">Delete</button>
             </div>
         </ul>
-    </div>
 
-    <div id="addTagToQueryDiv">
-        <button ng-click="addTagToQuery()" class="smallFont">Add tag to query</button>
+        <div>
+            <p class="smallFont" style="margin-bottom: 0px;">Include photos that match:</p>
+            <div>
+                <label class="smallFont">
+                    <input type="radio" ng-model="tagQueryOperator" style="margin: 0px 6px 0px 0px;" value="or">Any of
+                    the tags
+                </label>
+
+                <label class="smallFont">
+                    <input type="radio" ng-model="tagQueryOperator" style="margin: 0px 6px 0px 16px;" value="and">All of
+                    the tags
+                </label>
+
+            </div>
+
+        </div>
     </div>
 
     <br>
-
     <div>
-        <h4>Date spec</h4>
+        <h3>Dates</h3>
     </div>
 
     <div>
@@ -76,7 +92,6 @@
                value="endDateValue">
     </div>
 
-    <br>
     <br>
 
     <div id="loadQuery">

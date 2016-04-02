@@ -6,6 +6,7 @@ angular.module('shafferoto').controller('slideShow', ['$scope', 'shafferotoServe
 
     $scope.tags = [];
     $scope.tagsInQuery = [];
+    $scope.tagQueryOperator = "or";
     $scope.dateQueryType = "none";
 
     $scope.dateValue = new Date();
