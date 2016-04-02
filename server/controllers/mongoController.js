@@ -181,7 +181,15 @@ function queryPhotos(querySpecStr) {
                 //Photo.find( query, function(err, photoDocs) {
 
                 // this works
-                Photo.find( { dateTaken: { $lt: new Date(querySpec.dateValue) }}, function(err, photoDocs) {
+                //Photo.find( { dateTaken: { $lt: new Date(querySpec.dateValue) }}, function(err, photoDocs) {
+
+                var dateTakenSpec = {};
+                dateTakenSpec.$lt = new Date(querySpec.dateValue);
+
+                myQuery = {};
+                myQuery.dateTaken = dateTakenSpec;
+
+                Photo.find( myQuery, function(err, photoDocs) {
                     if (err) {
                         console.log("error returned from mongoose in queryPhotos");
                         reject();
