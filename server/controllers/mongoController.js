@@ -101,25 +101,21 @@ function queryPhotos(querySpecStr) {
                 var queryIncludesDateComponent = true;
                 var queryIncludesTags = true;
 
-                var dateQuerySnippet = "";
+                var dateTakenQueryFragment = {};
+
                 switch (querySpec.dateQueryType) {
                     case "before":
-                        var specDate = new Date(querySpec.dateValue);
-                        //dateQuerySnippet = "{ 'dateTaken': { $lt : new Date('" + specDate + "')} }";
-                        dateQuerySnippet = "{ dateTaken: { $lt : new Date('" + specDate + "')} }";
+                        dateTakenQueryFragment.$lt = new Date(querySpec.dateValue);
                         break;
                     case "after":
-                        var specDate = new Date(querySpec.dateValue);
-                        dateQuerySnippet = "{ 'dateTaken': { $gt : specDate } }";
+                        dateTakenQueryFragment.$gt = new Date(querySpec.dateValue);
                         break;
                     case "on":
-                        var specDate = new Date(querySpec.dateValue);
-                        dateQuerySnippet = "{ 'dateTaken': { $eq : specDate } }";
+                        dateTakenQueryFragment.$eq = new Date(querySpec.dateValue);
                         break;
                     case "between":
-                        var startDate = new Date(querySpec.startDateValue);
-                        var endDate = new Date(querySpec.endDateValue);
-                        dateQuerySnippet = "{ 'dateTaken': { $gt : startDate } }, { 'dateTaken': { $lt : endDate } }";
+                        dateTakenQueryFragment.$gt = new Date(querySpec.startDateValue);
+                        dateTakenQueryFragment.$lt = new Date(querySpec.endDateValue);
                         break;
                     default:
                         queryIncludesDateComponent = false;
@@ -135,18 +131,18 @@ function queryPhotos(querySpecStr) {
                 //    });
                 //}
 
-                var tagQuerySnippet = "";
-                if (querySpec.tagsInQuery.length > 0) {
-
-                    var tagsInQuery = [];
-                    querySpec.tagsInQuery.forEach(function (tagInQuery) {
-                        tagsInQuery.push(tagInQuery.tag);
-                    });
-                    tagQuerySnippet = "{ tags: { $in: tagsInQuery } }";
-                }
-                else {
-                    queryIncludesTags = false;
-                }
+                //var tagQuerySnippet = "";
+                //if (querySpec.tagsInQuery.length > 0) {
+                //
+                //    var tagsInQuery = [];
+                //    querySpec.tagsInQuery.forEach(function (tagInQuery) {
+                //        tagsInQuery.push(tagInQuery.tag);
+                //    });
+                //    tagQuerySnippet = "{ tags: { $in: tagsInQuery } }";
+                //}
+                //else {
+                //    queryIncludesTags = false;
+                //}
 
                 //db.inventory.find( {
                 //    $and : [
@@ -157,39 +153,35 @@ function queryPhotos(querySpecStr) {
 
                 var photos = [];
 
-                var query = "";
-                if (queryIncludesDateComponent && queryIncludesTags) {
-                    query = "{ $and : [";
-                    query += dateQuerySnippet + ",";
-                    query += tagQuerySnippet;
-                    query += "] }";
-                }
-                else if (queryIncludesDateComponent) {
-                    query = dateQuerySnippet;
-                }
-                else if (queryIncludesTags) {
-                    query = tagQuerySnippet;
-                }
-                else {
-                    resolve(photos);
-                }
+                //var query = "";
+                //if (queryIncludesDateComponent && queryIncludesTags) {
+                //    query = "{ $and : [";
+                //    query += dateQuerySnippet + ",";
+                //    query += tagQuerySnippet;
+                //    query += "] }";
+                //}
+                //else if (queryIncludesDateComponent) {
+                //    query = dateQuerySnippet;
+                //}
+                //else if (queryIncludesTags) {
+                //    query = tagQuerySnippet;
+                //}
+                //else {
+                //    resolve(photos);
+                //}
 
-                // these don't work
-                //query = "{ dateTaken: { $lt: new Date("Dec 30 2013") }}";
-                //query = "{ dateTaken: { $lt: new Date('Dec 30 2013') }}";
-                //Photo.find( { dateTaken: { $lt: new Date("Dec 30 2013") }}, function(err, photoDocs) {
-                //Photo.find( query, function(err, photoDocs) {
-
-                // this works
                 //Photo.find( { dateTaken: { $lt: new Date(querySpec.dateValue) }}, function(err, photoDocs) {
 
-                var dateTakenSpec = {};
-                dateTakenSpec.$lt = new Date(querySpec.dateValue);
+                //var dateTakenSpec = {};
+                //dateTakenSpec.$lt = new Date(querySpec.dateValue);
+                //
+                //myQuery = {};
+                //myQuery.dateTaken = dateTakenSpec;
 
-                myQuery = {};
-                myQuery.dateTaken = dateTakenSpec;
+                var photoQuery = {};
+                photoQuery.dateTaken = dateTakenQueryFragment;
 
-                Photo.find( myQuery, function(err, photoDocs) {
+                Photo.find( photoQuery, function(err, photoDocs) {
                     if (err) {
                         console.log("error returned from mongoose in queryPhotos");
                         reject();
