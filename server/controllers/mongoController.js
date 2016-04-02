@@ -33,7 +33,6 @@ function initialize() {
     db.once('open', function() {
         console.log("connected to shafferotoTest");
         dbOpened = true;
-
         //console.log('Look for photos in ' + photosDir);
         //photos = findPhotos(photosDir, photos);
         //
@@ -78,23 +77,6 @@ function queryPhotos(querySpecStr) {
 
         if (dbOpened) {
 
-            // example query using dates
-            //Photo.find( { dateTaken: { $gt: new Date("Dec 30 2013") }}, function(err, photoDocs) {
-            //    if (err) {
-            //        console.log("error returned from mongoose in queryPhotos");
-            //        reject();
-            //    }
-            //
-            //    photos = [];
-            //    photoDocs.forEach(function (photoDoc) {
-            //        photos.push({id: photoDoc.id, title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation, width: photoDoc.imageWidth, height: photoDoc.imageHeight, thumbUrl: photoDoc.thumbUrl, tags: photoDoc.tags });
-            //    });
-            //
-            //    resolve(photos);
-            //})
-            //
-            //return;
-
             var querySpec = JSON.parse(querySpecStr);
 
             if (typeof querySpec.tagsInQuery == "object" && Array.isArray(querySpec.tagsInQuery)) {
@@ -130,64 +112,42 @@ function queryPhotos(querySpecStr) {
                         break;
                 }
 
-                //if (queryIncludesDateComponent) {
-                //    Photo.find( dateQuerySnippet, function(err, photoDocs) {
-                //        if (err) {
-                //            console.log("error returned from mongoose in queryPhotos");
-                //            reject();
-                //        }
-                //    });
-                //}
+                var tagsInQueryFragment = {};
+                if (querySpec.tagsInQuery.length > 0) {
 
-                //var tagQuerySnippet = "";
-                //if (querySpec.tagsInQuery.length > 0) {
-                //
-                //    var tagsInQuery = [];
-                //    querySpec.tagsInQuery.forEach(function (tagInQuery) {
-                //        tagsInQuery.push(tagInQuery.tag);
-                //    });
-                //    tagQuerySnippet = "{ tags: { $in: tagsInQuery } }";
-                //}
-                //else {
-                //    queryIncludesTags = false;
-                //}
+                    var tagsInQuery = [];
+                    querySpec.tagsInQuery.forEach(function (tagInQuery) {
+                        tagsInQuery.push(tagInQuery.tag);
+                    });
 
-                //db.inventory.find( {
-                //    $and : [
-                //        { $or : [ { price : 0.99 }, { price : 1.99 } ] },
-                //        { $or : [ { sale : true }, { qty : { $lt : 20 } } ] }
-                //    ]
-                //} )
+                    tagsInQueryFragment.$in = tagsInQuery;
+                }
+                else {
+                    queryIncludesTags = false;
+                }
 
                 var photos = [];
 
-                //var query = "";
-                //if (queryIncludesDateComponent && queryIncludesTags) {
-                //    query = "{ $and : [";
-                //    query += dateQuerySnippet + ",";
-                //    query += tagQuerySnippet;
-                //    query += "] }";
-                //}
-                //else if (queryIncludesDateComponent) {
-                //    query = dateQuerySnippet;
-                //}
-                //else if (queryIncludesTags) {
-                //    query = tagQuerySnippet;
-                //}
-                //else {
-                //    resolve(photos);
-                //}
-
-                //Photo.find( { dateTaken: { $lt: new Date(querySpec.dateValue) }}, function(err, photoDocs) {
-
-                //var dateTakenSpec = {};
-                //dateTakenSpec.$lt = new Date(querySpec.dateValue);
-                //
-                //myQuery = {};
-                //myQuery.dateTaken = dateTakenSpec;
-
                 var photoQuery = {};
-                photoQuery.dateTaken = dateTakenQueryFragment;
+                if (queryIncludesDateComponent && queryIncludesTags) {
+                    var queryFragments = [];
+
+                    var dateTakenQuerySnippet = {};
+                    dateTakenQuerySnippet.dateTaken = dateTakenQueryFragment;
+                    queryFragments.push(dateTakenQuerySnippet);
+
+                    var tagsQuerySnippet = {};
+                    tagsQuerySnippet.tags = tagsInQueryFragment;
+                    queryFragments.push(tagsQuerySnippet);
+
+                    photoQuery.$and = queryFragments;
+                }
+                else if (queryIncludesDateComponent){
+                    photoQuery.dateTaken = dateTakenQueryFragment;
+                }
+                else if (queryIncludesTags) {
+                    photoQuery.tags = tagsInQueryFragment;
+                }
 
                 Photo.find( photoQuery, function(err, photoDocs) {
                     if (err) {
@@ -201,22 +161,7 @@ function queryPhotos(querySpecStr) {
                     });
 
                     resolve(photos);
-
                 });
-
-                //Photo.find( { tags: { $in: tagsInQuery } }, function(err, photoDocs) {
-                //    if (err) {
-                //        console.log("error returned from mongoose in queryPhotos");
-                //        reject();
-                //    }
-                //
-                //    photos = [];
-                //    photoDocs.forEach(function (photoDoc) {
-                //        photos.push({id: photoDoc.id, title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation, width: photoDoc.imageWidth, height: photoDoc.imageHeight, thumbUrl: photoDoc.thumbUrl, tags: photoDoc.tags });
-                //    });
-                //
-                //    resolve(photos);
-                //})
             }
             else {
                 debugger;

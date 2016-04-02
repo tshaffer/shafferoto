@@ -32,7 +32,6 @@ app.get('/getPhotos', function(req, res) {
   var fetchAllPhotosPromise = dbController.fetchAllPhotos();
   fetchAllPhotosPromise.then(function(allPhotos) {
     var response = {};
-    debugger;
     response.photos = allPhotos;
     res.send(response);
   });
