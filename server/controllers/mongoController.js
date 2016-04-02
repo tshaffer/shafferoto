@@ -19,6 +19,19 @@ var photoSchema = new Schema({
 });
 var Photo = mongoose.model('Photo', photoSchema);
 
+var photosQuerySchema = new Schema({
+    title:  String,
+    url: String,
+    dateTaken: Date,
+    orientation: Number,
+    imageWidth: Number,
+    imageHeight: Number,
+    tags: [String],
+    thumbUrl: String,
+    comments: [{ body: String, date: Date }],
+});
+var PhotosQuery = mongoose.model('PhotosQuery', photosQuerySchema);
+
 var tagSchema = new Schema ({
     label: String
 });
@@ -33,12 +46,6 @@ function initialize() {
     db.once('open', function() {
         console.log("connected to shafferotoTest");
         dbOpened = true;
-        //console.log('Look for photos in ' + photosDir);
-        //photos = findPhotos(photosDir, photos);
-        //
-        //if (photos.length > 0) {
-        //    getExifData(photos, 0);
-        //}
     });
 }
 
@@ -69,6 +76,19 @@ function fetchAllPhotos() {
     });
 }
 
+
+function saveQueryToDB(queryStr) {
+
+    return new Promise(function( resolve, reject) {
+
+        if (dbOpened) {
+
+        }
+        else {
+            reject();
+        }
+    });
+}
 
 function queryPhotos(querySpecStr) {
 
