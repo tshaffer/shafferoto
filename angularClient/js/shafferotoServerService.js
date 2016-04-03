@@ -36,6 +36,16 @@ angular.module('shafferoto').service('shafferotoServerService', ['$http', functi
         return promise;
     };
 
+    this.addQuery = function(querySpec) {
+
+        var url = self.baseUrl + "addQuery";
+
+        var promise = $http.get(url, {
+            params: { querySpec: querySpec }
+        });
+        return promise;
+    }
+
     this.getTags = function() {
 
         var url = self.baseUrl + "getTags";

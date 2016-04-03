@@ -1,4 +1,4 @@
-var dbOpened = false;
+    var dbOpened = false;
 
 var mongoose = require('mongoose');
 require('datejs');
@@ -20,16 +20,15 @@ var photoSchema = new Schema({
 var Photo = mongoose.model('Photo', photoSchema);
 
 var photosQuerySchema = new Schema({
-    title:  String,
-    url: String,
-    dateTaken: Date,
-    orientation: Number,
-    imageWidth: Number,
-    imageHeight: Number,
+    name:  String,
     tags: [String],
-    thumbUrl: String,
-    comments: [{ body: String, date: Date }],
+    tagQueryOperator: String,
+    dateQueryType: String,
+    dateValue: Date,
+    startDateValue: Date,
+    endDateValue: Date
 });
+
 var PhotosQuery = mongoose.model('PhotosQuery', photosQuerySchema);
 
 var tagSchema = new Schema ({
@@ -77,12 +76,40 @@ function fetchAllPhotos() {
 }
 
 
-function saveQueryToDB(queryStr) {
+function saveQueryToDB(querySpecStr) {
 
     return new Promise(function( resolve, reject) {
 
         if (dbOpened) {
 
+            var querySpec = JSON.parse(querySpecStr);
+
+            var tags = [];
+            if (querySpec.tagsInQuery.length > 0) {
+
+                var tagsInQuery = [];
+                querySpec.tagsInQuery.forEach(function (tagInQuery) {
+                    tags.push(tagInQuery.tag);
+                });
+            }
+
+            var queryForDB = new PhotosQuery({
+                name: querySpec.name,
+                tags: tags,
+                tagQueryOperator: querySpec.tagQueryOperator,
+                dateQueryType: querySpec.dateQueryType,
+                dateValue: new Date(querySpec.dateValue),
+                startDateValue: new Date(querySpec.startDateValue),
+                endDateValue: new Date(querySpec.endDateValue)
+            });
+
+            queryForDB.save(function (err) {
+                if (err) reject(err);
+
+                resolve();
+            });
+
+            console.log("query saved");
         }
         else {
             reject();
@@ -339,5 +366,6 @@ module.exports = {
     fetchAllTags: fetchAllTags,
     addTagToDB: addTagToDB,
     updateTags: updateTags,
-    queryPhotos: queryPhotos
+    queryPhotos: queryPhotos,
+    saveQueryToDB: saveQueryToDB
 }

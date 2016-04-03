@@ -55,6 +55,22 @@ app.get('/queryPhotos', function(req, res) {
 });
 
 
+app.get('/addQuery', function (req, res) {
+
+  res.set('Access-Control-Allow-Origin', '*');
+
+  var querySpec = req.query.querySpec;
+
+  console.log("addQuery invoked");
+
+  var addQueryPromise = dbController.saveQueryToDB(querySpec);
+  addQueryPromise.then(function() {
+    res.send("query added");
+  });
+});
+
+
+
 app.get('/getTags', function(req, res) {
 
   console.log("getTags invoked");
