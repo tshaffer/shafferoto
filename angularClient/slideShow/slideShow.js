@@ -14,15 +14,24 @@ angular.module('shafferoto').controller('slideShow', ['$scope', 'shafferotoServe
     $scope.startDateValue = new Date();
     $scope.endDateValue = new Date();
 
+    $scope.queries = [];
+
     var getTagsPromise = $shafferotoServerService.getTags();
+    var getQueriesPromise = $shafferotoServerService.getQueries();
+
     getTagsPromise.then(function (result) {
         result.data.Tags.forEach(function(tag){
             $scope.tags.push(tag.label);
         });
     });
 
+    getQueriesPromise.then(function (result) {
+        result.data.forEach(function(query){
+            $scope.queries.push(query);
+        });
+    });
+    
     $scope.addTagToQuery = function() {
-
         var tagInQuery = {};
         tagInQuery.tag = $scope.tags[0];
         $scope.tagsInQuery.push(tagInQuery);

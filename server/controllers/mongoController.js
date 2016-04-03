@@ -277,6 +277,28 @@ function savePhotosToDB(photos) {
 }
 
 
+function getQueries() {
+
+    return new Promise(function (resolve, reject) {
+
+        if (dbOpened) {
+
+            PhotosQuery.find({}, function (err, queries) {
+                if (err) {
+                    console.log("error returned from mongoose query");
+                    reject();
+                }
+                
+                resolve(queries);
+            });
+        }
+        else {
+            reject();
+        }
+    });
+}
+
+
 function fetchAllTags() {
 
     return new Promise(function (resolve, reject) {
@@ -367,5 +389,6 @@ module.exports = {
     addTagToDB: addTagToDB,
     updateTags: updateTags,
     queryPhotos: queryPhotos,
-    saveQueryToDB: saveQueryToDB
+    saveQueryToDB: saveQueryToDB,
+    getQueries: getQueries
 }

@@ -70,6 +70,17 @@ app.get('/addQuery', function (req, res) {
 });
 
 
+app.get('/getQueries', function (req, res) {
+
+  console.log("getQueries invoked");
+  res.set('Access-Control-Allow-Origin', '*');
+
+  var getQueriesPromise = dbController.getQueries();
+  getQueriesPromise.then(function(allQueries) {
+    res.send(allQueries);
+  });
+});
+
 
 app.get('/getTags', function(req, res) {
 
