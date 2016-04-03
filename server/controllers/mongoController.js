@@ -125,98 +125,92 @@ function queryPhotos(querySpecStr) {
 
             var querySpec = JSON.parse(querySpecStr);
 
-            if (typeof querySpec.tagsInQuery == "object" && Array.isArray(querySpec.tagsInQuery)) {
+            var queryIncludesDateComponent = true;
+            var queryIncludesTags = true;
 
-                var queryIncludesDateComponent = true;
-                var queryIncludesTags = true;
+            var dateTakenQueryFragment = {};
 
-                var dateTakenQueryFragment = {};
+            switch (querySpec.dateQueryType) {
+                case "before":
+                    dateTakenQueryFragment.$lt = new Date(querySpec.dateValue);
+                    break;
+                case "after":
+                    dateTakenQueryFragment.$gt = new Date(querySpec.dateValue);
+                    break;
+                case "on":
+                    var startDate = new Date(querySpec.dateValue);
+                    startDate.clearTime();
 
-                switch (querySpec.dateQueryType) {
-                    case "before":
-                        dateTakenQueryFragment.$lt = new Date(querySpec.dateValue);
-                        break;
-                    case "after":
-                        dateTakenQueryFragment.$gt = new Date(querySpec.dateValue);
-                        break;
-                    case "on":
-                        var startDate = new Date(querySpec.dateValue);
-                        startDate.clearTime();
+                    var endDate = new Date(querySpec.dateValue);
+                    endDate.clearTime().addDays(1);
 
-                        var endDate = new Date(querySpec.dateValue);
-                        endDate.clearTime().addDays(1);
+                    dateTakenQueryFragment.$gt = startDate;
+                    dateTakenQueryFragment.$lt = endDate;
+                    break;
+                case "between":
+                    dateTakenQueryFragment.$gt = new Date(querySpec.startDateValue);
+                    dateTakenQueryFragment.$lt = new Date(querySpec.endDateValue);
+                    break;
+                default:
+                    queryIncludesDateComponent = false;
+                    break;
+            }
 
-                        dateTakenQueryFragment.$gt = startDate;
-                        dateTakenQueryFragment.$lt = endDate;
-                        break;
-                    case "between":
-                        dateTakenQueryFragment.$gt = new Date(querySpec.startDateValue);
-                        dateTakenQueryFragment.$lt = new Date(querySpec.endDateValue);
-                        break;
-                    default:
-                        queryIncludesDateComponent = false;
-                        break;
-                }
+            var tagsInQueryFragment = {};
+            if (typeof querySpec.tagsInQuery == "object" && Array.isArray(querySpec.tagsInQuery) && (querySpec.tagsInQuery.length > 0)) {
 
-                var tagsInQueryFragment = {};
-                if (querySpec.tagsInQuery.length > 0) {
+                var tagsInQuery = [];
+                querySpec.tagsInQuery.forEach(function (tagInQuery) {
+                    tagsInQuery.push(tagInQuery.tag);
+                });
 
-                    var tagsInQuery = [];
-                    querySpec.tagsInQuery.forEach(function (tagInQuery) {
-                        tagsInQuery.push(tagInQuery.tag);
-                    });
-
-                    if (querySpec.tagQueryOperator == 'or') {
-                        tagsInQueryFragment.$in = tagsInQuery;
-                    }
-                    else {
-                        tagsInQueryFragment.$all = tagsInQuery;
-                    }
+                if (querySpec.tagQueryOperator == 'or') {
+                    tagsInQueryFragment.$in = tagsInQuery;
                 }
                 else {
-                    queryIncludesTags = false;
+                    tagsInQueryFragment.$all = tagsInQuery;
                 }
-
-                var photos = [];
-
-                var photoQuery = {};
-                if (queryIncludesDateComponent && queryIncludesTags) {
-                    var queryFragments = [];
-
-                    var dateTakenQuerySnippet = {};
-                    dateTakenQuerySnippet.dateTaken = dateTakenQueryFragment;
-                    queryFragments.push(dateTakenQuerySnippet);
-
-                    var tagsQuerySnippet = {};
-                    tagsQuerySnippet.tags = tagsInQueryFragment;
-                    queryFragments.push(tagsQuerySnippet);
-
-                    photoQuery.$and = queryFragments;
-                }
-                else if (queryIncludesDateComponent){
-                    photoQuery.dateTaken = dateTakenQueryFragment;
-                }
-                else if (queryIncludesTags) {
-                    photoQuery.tags = tagsInQueryFragment;
-                }
-
-                Photo.find( photoQuery, function(err, photoDocs) {
-                    if (err) {
-                        console.log("error returned from mongoose in queryPhotos");
-                        reject();
-                    }
-
-                    photos = [];
-                    photoDocs.forEach(function (photoDoc) {
-                        photos.push({id: photoDoc.id, title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation, width: photoDoc.imageWidth, height: photoDoc.imageHeight, thumbUrl: photoDoc.thumbUrl, tags: photoDoc.tags });
-                    });
-
-                    resolve(photos);
-                });
             }
             else {
-                debugger;
+                queryIncludesTags = false;
             }
+
+            var photos = [];
+
+            var photoQuery = {};
+            if (queryIncludesDateComponent && queryIncludesTags) {
+                var queryFragments = [];
+
+                var dateTakenQuerySnippet = {};
+                dateTakenQuerySnippet.dateTaken = dateTakenQueryFragment;
+                queryFragments.push(dateTakenQuerySnippet);
+
+                var tagsQuerySnippet = {};
+                tagsQuerySnippet.tags = tagsInQueryFragment;
+                queryFragments.push(tagsQuerySnippet);
+
+                photoQuery.$and = queryFragments;
+            }
+            else if (queryIncludesDateComponent){
+                photoQuery.dateTaken = dateTakenQueryFragment;
+            }
+            else if (queryIncludesTags) {
+                photoQuery.tags = tagsInQueryFragment;
+            }
+
+            Photo.find( photoQuery, function(err, photoDocs) {
+                if (err) {
+                    console.log("error returned from mongoose in queryPhotos");
+                    reject();
+                }
+
+                photos = [];
+                photoDocs.forEach(function (photoDoc) {
+                    photos.push({id: photoDoc.id, title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation, width: photoDoc.imageWidth, height: photoDoc.imageHeight, thumbUrl: photoDoc.thumbUrl, tags: photoDoc.tags });
+                });
+
+                resolve(photos);
+            });
         }
         else {
             reject();
@@ -288,8 +282,29 @@ function getQueries() {
                     console.log("error returned from mongoose query");
                     reject();
                 }
-                
+
                 resolve(queries);
+            });
+        }
+        else {
+            reject();
+        }
+    });
+}
+
+function getQuery(queryName) {
+
+    return new Promise(function (resolve, reject) {
+
+        if (dbOpened) {
+
+            PhotosQuery.findOne({ name: queryName }, function (err, query) {
+                if (err) {
+                    console.log("error returned from mongoose query");
+                    reject();
+                }
+
+                resolve(query);
             });
         }
         else {
@@ -390,5 +405,6 @@ module.exports = {
     updateTags: updateTags,
     queryPhotos: queryPhotos,
     saveQueryToDB: saveQueryToDB,
-    getQueries: getQueries
+    getQueries: getQueries,
+    getQuery: getQuery
 }

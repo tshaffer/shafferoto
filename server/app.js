@@ -82,6 +82,20 @@ app.get('/getQueries', function (req, res) {
 });
 
 
+app.get('/getQuery', function (req, res) {
+
+  console.log("getQuery invoked");
+  res.set('Access-Control-Allow-Origin', '*');
+
+  var queryName = req.query.queryName;
+
+  var getQueryPromise = dbController.getQuery(queryName);
+  getQueryPromise.then(function(query) {
+    res.send(query);
+  });
+});
+
+
 app.get('/getTags', function(req, res) {
 
   console.log("getTags invoked");

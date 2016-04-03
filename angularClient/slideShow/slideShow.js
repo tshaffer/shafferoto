@@ -15,7 +15,7 @@ angular.module('shafferoto').controller('slideShow', ['$scope', 'shafferotoServe
     $scope.endDateValue = new Date();
 
     $scope.queries = [];
-    $scope.queryToLoad = "";
+    $scope.queryToLoad = null;
 
     var getTagsPromise = $shafferotoServerService.getTags();
     var getQueriesPromise = $shafferotoServerService.getQueries();
@@ -34,7 +34,7 @@ angular.module('shafferoto').controller('slideShow', ['$scope', 'shafferotoServe
             $scope.queryToLoad = $scope.queries[0];
         }
         else {
-            $scope.queryToLoad = "";
+            $scope.queryToLoad = null;
         }
     });
     
@@ -50,6 +50,19 @@ angular.module('shafferoto').controller('slideShow', ['$scope', 'shafferotoServe
 
     $scope.loadQuery = function() {
         console.log("load query");
+
+        var getQueryPromise = $shafferotoServerService.getQuery($scope.queryToLoad.name);
+        getQueryPromise.then(function(result) {
+            var querySpec = result.data;
+
+            $scope.tagsInQuery = querySpec.tagsInQuery;
+            $scope.tagQueryOperator = querySpec.tagQueryOperator;
+
+            $scope.dateQueryType = querySpec.dateQueryType;
+            $scope.dateValue = new Date(querySpec.dateValue);
+            $scope.startDateValue = new Date(querySpec.startDateValue);
+            $scope.endDateValue = new Date(querySpec.endDateValue);
+        });
     };
 
     $scope.buildQuerySpec = function() {
