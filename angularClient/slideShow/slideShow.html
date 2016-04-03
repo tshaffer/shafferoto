@@ -96,6 +96,7 @@
 
     <div id="loadQuery">
         <button ng-click="loadQuery()" class="mediumFont">Load query</button>
+        <select name="queries" id="queries" ng-model="queryToLoad" ng-options="query.name for query in queries"></select>
     </div>
 
     <br>
