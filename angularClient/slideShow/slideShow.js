@@ -55,7 +55,12 @@ angular.module('shafferoto').controller('slideShow', ['$scope', 'shafferotoServe
         getQueryPromise.then(function(result) {
             var querySpec = result.data;
 
-            $scope.tagsInQuery = querySpec.tagsInQuery;
+            querySpec.tags.forEach(function(tag) {
+                var tagInQuery = {};
+                tagInQuery.tag = tag;
+                $scope.tagsInQuery.push(tagInQuery);
+            });
+
             $scope.tagQueryOperator = querySpec.tagQueryOperator;
 
             $scope.dateQueryType = querySpec.dateQueryType;
