@@ -3,16 +3,6 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
     $scope.photos = [];
     $scope.playlistThumbs = [];
 
-    // $scope.imagesById = {};
-
-    var photoTemplate = "";
-    photoTemplate  = "<div><div class='ui-grid-cell-contents'>";
-    //photoTemplate += "<img ng-class=\"{ rotate90: grid.getCellValue(row, col).orientation==6, rotate180: grid.getCellValue(row, col).orientation==3 }\" height='{{grid.getCellValue(row, col).height}}' width='{{grid.getCellValue(row, col).width}}' ng-src=\"{{grid.getCellValue(row, col).url}}\">";
-    photoTemplate += "<img ng-src=\"{{grid.getCellValue(row, col).thumbUrl}}\">";
-    photoTemplate += "</div>";
-
-    photoTemplate += "<div><p class='centerText'>{{grid.getCellValue(row, col).tagList}}</p></div>";
-    photoTemplate += "</div>";
     
     // retrieve all photos from the db
     var getPhotosPromise = $shafferotoServerService.getPhotos();
@@ -22,9 +12,10 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
         var baseUrl = $shafferotoServerService.getBaseUrl() +  "photos/";
 
         var columnIndex = 0;
-        var photo = {};
 
         result.data.photos.forEach(function(dbPhoto){
+
+            var photo = {};
 
             photo.url = baseUrl + dbPhoto.url;
             photo.thumbUrl = baseUrl + dbPhoto.thumbUrl;
@@ -33,10 +24,18 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
             var width = dbPhoto.width;
             var height = dbPhoto.height;
-            var ratio = height / width;
 
-            //console.log("width/height ratio is: " + (photo.width / photo.height).toString());
+            var ratio;
+            if (photo.orientation == 6) {
+                ratio = height / width;
+            }
+            else {
+                ratio = width / height;
+            }
 
+            photo.height = 108;
+            photo.width = ratio * photo.height;
+            
             photo.tagList = "";
             dbPhoto.tags.forEach(function(tag) {
                photo.tagList += tag + ", ";
@@ -46,15 +45,6 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
             photo.dbPhoto = dbPhoto;
 
             $scope.photos.push(photo);
-
-
-            // can I share .photos and .playlistThumbs?? probably
-            var playlistThumb = {};
-            playlistThumb.thumbUrl = photo.thumbUrl;
-            playlistThumb.title = photo.title;
-
-            // need $scope.$apply()???
-            $scope.playlistThumbs.push(playlistThumb);
         });
 
         console.log("all done");

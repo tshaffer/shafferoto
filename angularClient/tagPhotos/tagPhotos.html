@@ -15,8 +15,8 @@
 
      <div class="photosDiv" >
          <ul class="flex-container wrap">
-             <li ng-repeat="thumb in playlistThumbs" class="flex-item mediaLibraryThumbDiv">
-                 <img ng-src="{{thumb.thumbUrl}}" class="mediaLibraryThumbImg" >
+             <li ng-repeat="photo in photos" class="flex-item photoThumbsDiv">
+                 <img ng-src="{{photo.thumbUrl}}" class="thumbImg" width="{{photo.width}}" height="{{photo.height}}">
              </li>
          </ul>
      </div>
