@@ -1,9 +1,7 @@
 angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServerService', function($scope, $shafferotoServerService ) {
 
-    var numColumns = 4;
-
     $scope.photos = [];
-    $scope.imagesById = {};
+    // $scope.imagesById = {};
 
     var photoTemplate = "";
     photoTemplate  = "<div><div class='ui-grid-cell-contents'>";
@@ -13,29 +11,7 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
     photoTemplate += "<div><p class='centerText'>{{grid.getCellValue(row, col).tagList}}</p></div>";
     photoTemplate += "</div>";
-
-    var photoColumns = [];
-
-    $scope.gridOptions = {
-        showHeader: false,
-        modifierKeysToMultiSelectCells: true,
-        rowHeight:300,
-        columnDefs: photoColumns
-    };
-
-    $scope.gridOptions.data = $scope.photos;
-
-    for (i = 0; i < numColumns; i++) {
-        photoColumn = {};
-        //photoColumn.name = 'Photo' + i.toString();
-        photoColumn.name = 'image' + i.toString();
-        photoColumn.field = photoColumn.name;
-        //photoColumn.field = 'image' + i.toString();
-        photoColumn.cellTemplate = photoTemplate;
-
-        photoColumns.push(photoColumn);
-    }
-
+    
     // retrieve all photos from the db
     var getPhotosPromise = $shafferotoServerService.getPhotos();
     getPhotosPromise.then(function (result) {
@@ -48,44 +24,26 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
         result.data.photos.forEach(function(dbPhoto){
 
-            var image = {};
-            image.url = baseUrl + dbPhoto.url;
-            image.thumbUrl = baseUrl + dbPhoto.thumbUrl;
-            image.orientation = dbPhoto.orientation;
-            image.title = dbPhoto.title;
+            photo.url = baseUrl + dbPhoto.url;
+            photo.thumbUrl = baseUrl + dbPhoto.thumbUrl;
+            photo.orientation = dbPhoto.orientation;
+            photo.title = dbPhoto.title;
 
             var width = dbPhoto.width;
             var height = dbPhoto.height;
             var ratio = height / width;
 
-            var heightRatio = height / 250;
-            var updatedWidth = width/(height/250);
-            image.width = updatedWidth;
-            image.height = 250;
-            image.maxHeight = 250;
-            //console.log("width/height ratio is: " + (image.width / image.height).toString());
+            //console.log("width/height ratio is: " + (photo.width / photo.height).toString());
 
-            image.tagList = "";
+            photo.tagList = "";
             dbPhoto.tags.forEach(function(tag) {
-               image.tagList += tag + ", ";
+               photo.tagList += tag + ", ";
             });
-            image.tagList = image.tagList.substring(0, image.tagList.length - 2);
+            photo.tagList = photo.tagList.substring(0, photo.tagList.length - 2);
 
-            // TODO - doing this for expediency - best design?
-            image.dbPhoto = dbPhoto;
+            photo.dbPhoto = dbPhoto;
 
-            $scope.imagesById[dbPhoto.id] = image;
-
-            var key = "image" + columnIndex.toString();
-            photo[key] = image;
-            columnIndex++;
-
-            if ((columnIndex % numColumns) == 0) {
-                $scope.photos.push(photo);
-                photo = {};
-                columnIndex = 0;
-            }
-
+            $scope.photos.push(photo);
         });
 
         console.log("all done");
@@ -103,22 +61,6 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
         });
         $scope.selectedTag = $scope.tags[0];
     });
-
-    $scope.gridOptions.onRegisterApi = function(gridApi){
-        $scope.gridApi = gridApi;
-        gridApi.cellNav.on.navigate($scope,function(newRowCol, oldRowCol){
-            console.log('navigation event');
-        });
-    };
-
-    $scope.getCurrentSelection = function() {
-        var selectedPhotos = [];
-        var currentSelection = $scope.gridApi.cellNav.getCurrentSelection();
-        for (var i = 0; i < currentSelection.length; i++) {
-            selectedPhotos.push(currentSelection[i].row.entity[currentSelection[i].col.name]);
-        }
-        return selectedPhotos;
-    };
 
     $scope.isTagMissingFromPhoto = function(indexOfTag) {
         return indexOfTag < 0;

@@ -1,6 +1,6 @@
 angular
     //.module('shafferoto', ['ngAnimate', 'ngRoute', 'ui.bootstrap'])
-    .module('shafferoto', ['ngAnimate', 'ngRoute', 'ui.grid', 'ui.grid.cellNav'])
+    .module('shafferoto', ['ngAnimate', 'ngRoute'])
 
     .directive('slider', function ($timeout) {
     return {
