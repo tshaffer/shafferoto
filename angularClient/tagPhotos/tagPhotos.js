@@ -1,6 +1,8 @@
 angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServerService', function($scope, $shafferotoServerService ) {
 
     $scope.photos = [];
+    $scope.playlistThumbs = [];
+
     // $scope.imagesById = {};
 
     var photoTemplate = "";
@@ -44,6 +46,15 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
             photo.dbPhoto = dbPhoto;
 
             $scope.photos.push(photo);
+
+
+            // can I share .photos and .playlistThumbs?? probably
+            var playlistThumb = {};
+            playlistThumb.thumbUrl = photo.thumbUrl;
+            playlistThumb.title = photo.title;
+
+            // need $scope.$apply()???
+            $scope.playlistThumbs.push(playlistThumb);
         });
 
         console.log("all done");
