@@ -11,13 +11,19 @@
         <!--</button>-->
 <!--</div>-->
 
+<div class='photoPageContainer'>
 
- <div class="photosDiv" >
-     <ul class="flex-container wrap">
-         <li ng-repeat="thumb in playlistThumbs" class="flex-item mediaLibraryThumbDiv">
-             <img ng-src="{{thumb.thumbUrl}}" class="mediaLibraryThumbImg" >
-         </li>
-     </ul>
- </div>
+     <div class="photosDiv" >
+         <ul class="flex-container wrap">
+             <li ng-repeat="thumb in playlistThumbs" class="flex-item mediaLibraryThumbDiv">
+                 <img ng-src="{{thumb.thumbUrl}}" class="mediaLibraryThumbImg" >
+             </li>
+         </ul>
+     </div>
 
+     <div class="metadata">
+         Photo metadata, etc.
+     </div>
+
+</div>
 

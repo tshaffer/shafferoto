@@ -83,7 +83,22 @@ color: #222;
   opacity:1;
 }
 
+body {
+	height: 100%;
+}
+
+.photoPageContainer {
+	/*height: 100vh;*/
+	max-height: 750px;
+	display: flex;
+}
+
+.metadata {
+	flex: 1;
+}
 .photosDiv {
+	flex: 4;
+	overflow-y: scroll;
 	/*margin-left: 250px;*/
 }
 
