@@ -45,7 +45,7 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
             var dateTaken = dbPhoto.dateTaken;
             var dt = new Date(dateTaken);
             // photo.dateTaken = dt.toString("M/d/yyyy HH:mm");
-            photo.dateTaken = dt.toString("M/d/yyyy hh:mm");
+            photo.dateTaken = dt.toString("M/d/yyyy hh:mm tt");
             
             photo.tagList = "";
             dbPhoto.tags.forEach(function(tag) {
