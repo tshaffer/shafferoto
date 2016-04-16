@@ -23,6 +23,8 @@
 
      <div class="metadata">
 
+         <h4>Metadata</h4>
+
          <div>
              <span class="leftColumn smallFont">Name:</span>
              <span class="rightColumn smallFont">{{selectedPhoto.title}}</span>
@@ -37,6 +39,13 @@
              <span class="leftColumn smallFont">Date taken:</span>
              <span class="rightColumn smallFont">{{selectedPhoto.dateTaken}}</span>
          </div>
+
+         <h4>Tags</h4>
+
+         <h5 style="padding-left: 8px">Existing Tags</h5>
+         <ul style="max-height: 100px; overflow-y: scroll  ">
+             <h6 ng-repeat="tag in tags">{{tag}}</h6>
+         </ul>
 
      </div>
 
