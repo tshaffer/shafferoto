@@ -2,6 +2,9 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
     $scope.photos = [];
     $scope.playlistThumbs = [];
+    $scope.selectedPhoto = null;
+
+    var photosById = {};
 
     // limit height of div that contains the grid of photos
     $scope.photoPageContainerHeight = window.innerHeight - 100;
@@ -19,6 +22,7 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
             var photo = {};
 
+            photo.dbId = dbPhoto.id;
             photo.url = baseUrl + dbPhoto.url;
             photo.thumbUrl = baseUrl + dbPhoto.thumbUrl;
             photo.orientation = dbPhoto.orientation;
@@ -37,6 +41,11 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
             photo.height = 108;
             photo.width = ratio * photo.height;
+
+            var dateTaken = dbPhoto.dateTaken;
+            var dt = new Date(dateTaken);
+            // photo.dateTaken = dt.toString("M/d/yyyy HH:mm");
+            photo.dateTaken = dt.toString("M/d/yyyy hh:mm");
             
             photo.tagList = "";
             dbPhoto.tags.forEach(function(tag) {
@@ -47,6 +56,8 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
             photo.dbPhoto = dbPhoto;
 
             $scope.photos.push(photo);
+
+            photosById[dbPhoto.id] = photo;
         });
 
         console.log("all done");
@@ -159,4 +170,10 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
         var photosUpdateSpec = $scope.getPhotosToUpdate($scope.getAssignTagPhotoToUpdate);
         $scope.updateTags(photosUpdateSpec);
     };
+    
+    $scope.selectPhoto = function(event) {
+        console.log("selected photo " + event.target.id);
+
+        $scope.selectedPhoto = photosById[event.target.id];
+    }
 }]);

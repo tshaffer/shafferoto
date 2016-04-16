@@ -16,13 +16,28 @@
      <div class="photosDiv" >
          <ul class="flex-container wrap">
              <li ng-repeat="photo in photos" class="flex-item photoThumbsDiv">
-                 <img ng-src="{{photo.thumbUrl}}" class="thumbImg" width="{{photo.width}}" height="{{photo.height}}">
+                 <img id="{{photo.dbId}}" ng-src="{{photo.thumbUrl}}" class="thumbImg" width="{{photo.width}}" height="{{photo.height}}" ng-click="selectPhoto($event)">
              </li>
          </ul>
      </div>
 
      <div class="metadata">
-         Photo metadata, etc.
+
+         <div>
+             <span class="leftColumn smallFont">Name:</span>
+             <span class="rightColumn smallFont">{{selectedPhoto.title}}</span>
+         </div>
+
+         <div>
+             <span class="leftColumn smallFont">Dimensions:</span>
+             <span class="rightColumn smallFont">{{selectedPhoto.dbPhoto.width}}x{{selectedPhoto.dbPhoto.height}}</span>
+         </div>
+
+         <div>
+             <span class="leftColumn smallFont">Date taken:</span>
+             <span class="rightColumn smallFont">{{selectedPhoto.dateTaken}}</span>
+         </div>
+
      </div>
 
 </div>
