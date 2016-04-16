@@ -3,7 +3,9 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
     $scope.photos = [];
     $scope.playlistThumbs = [];
 
-    
+    // limit height of div that contains the grid of photos
+    $scope.photoPageContainerHeight = window.innerHeight - 100;
+
     // retrieve all photos from the db
     var getPhotosPromise = $shafferotoServerService.getPhotos();
     getPhotosPromise.then(function (result) {
