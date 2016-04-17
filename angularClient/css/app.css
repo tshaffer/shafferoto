@@ -109,13 +109,16 @@ body {
 	height: 100%;
 }
 
+.shafferotoContainer {
+    width: 1400px;
+}
 .photoPageContainer {
     display: flex;
 }
 
 /*Photos section*/
 .photosDiv {
-    flex: 4;
+    flex: 3;
     overflow-y: scroll;
     /*margin-left: 250px;*/
 }
@@ -160,8 +163,14 @@ body {
 }
 
 /*Metadata sidebar*/
+/*currently 274px wide*/
+/*342.5*/
 .metadata {
 	flex: 1;
+}
+
+.metadataSubheading {
+    margin-bottom: 2px;
 }
 
 .photoMetadata {
@@ -179,12 +188,16 @@ body {
 }
 
 .searchSection {
+    margin-left: 16px;
 }
 
 .tagsSubsection {
+    margin-left: 16px;
 }
 
 .datesSubsection {
+    margin-left: 16px;
+    margin-top: -4px;
 }
 
 /*@media (min-height: 700px)  {*/
