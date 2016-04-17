@@ -176,4 +176,19 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
         $scope.selectedPhoto = photosById[event.target.id];
     }
+
+    $scope.addTag = function () {
+
+        // add tag to database
+        if ($scope.tagLabel != "") {
+            $shafferotoServerService.addTag($scope.tagLabel);
+
+            $scope.tags.push($scope.tagLabel);
+            $scope.tagLabel = "";
+        }
+    };
+
+    $scope.tagLabel = "";
+
+
 }]);

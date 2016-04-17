@@ -47,6 +47,15 @@
              <h6 ng-repeat="tag in tags">{{tag}}</h6>
          </ul>
 
+         <div>
+             <div>
+                 <input class="smallFont" type="text" id="tag" name="tag" ng-model="tagLabel" style="width: 140px;"
+                        placeholder="Type the new tag" required>
+                 <button type="button" class="smallFont" ng-click="addTag()">Add Tag</button>
+             </div>
+
+
+         </div>
      </div>
 
 </div>
