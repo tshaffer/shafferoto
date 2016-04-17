@@ -28,46 +28,13 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
     getPhotosPromise.then(function (result) {
         console.log("getPhotos successful");
 
-        var baseUrl = $shafferotoServerService.getBaseUrl() +  "photos/";
+        $scope.baseUrl = $shafferotoServerService.getBaseUrl() +  "photos/";
 
         var columnIndex = 0;
 
         result.data.photos.forEach(function(dbPhoto){
 
-            var photo = {};
-
-            photo.dbId = dbPhoto.id;
-            photo.url = baseUrl + dbPhoto.url;
-            photo.thumbUrl = baseUrl + dbPhoto.thumbUrl;
-            photo.orientation = dbPhoto.orientation;
-            photo.title = dbPhoto.title;
-
-            var width = dbPhoto.width;
-            var height = dbPhoto.height;
-
-            var ratio;
-            if (photo.orientation == 6) {
-                ratio = height / width;
-            }
-            else {
-                ratio = width / height;
-            }
-
-            photo.height = 108;
-            photo.width = ratio * photo.height;
-
-            var dateTaken = dbPhoto.dateTaken;
-            var dt = new Date(dateTaken);
-            // photo.dateTaken = dt.toString("M/d/yyyy HH:mm");
-            photo.dateTaken = dt.toString("M/d/yyyy hh:mm tt");
-            
-            photo.tagList = "";
-            dbPhoto.tags.forEach(function(tag) {
-               photo.tagList += tag + ", ";
-            });
-            photo.tagList = photo.tagList.substring(0, photo.tagList.length - 2);
-
-            photo.dbPhoto = dbPhoto;
+            var photo = $scope.getPhotoFromDBPhoto(dbPhoto);
 
             $scope.photos.push(photo);
 
@@ -102,7 +69,7 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
             $scope.queryToLoad = null;
         }
     });
-    
+
     $scope.isTagMissingFromPhoto = function(indexOfTag) {
         return indexOfTag < 0;
     }
@@ -282,5 +249,70 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
         });
     };
 
+    $scope.search = function() {
 
+        console.log("performSearch");
+
+        var querySpec = $scope.buildQuerySpec();
+        querySpec.tagsInQuery = $scope.tagsInQuery;
+
+        var queryPhotosPromise = $shafferotoServerService.queryPhotos(querySpec);
+        queryPhotosPromise.then(function (result) {
+
+            console.log("queryPhotos successful");
+
+            $scope.photos = [];
+            $scope.baseUrl = $shafferotoServerService.getBaseUrl() +  "photos/";
+
+            result.data.photos.forEach(function(dbPhoto){
+
+                var photo = $scope.getPhotoFromDBPhoto(dbPhoto);
+                $scope.photos.push(photo);
+                photosById[dbPhoto.id] = photo;
+            });
+
+            // $scope.$broadcast("imagesInitialized");
+        });
+
+    }
+
+    $scope.getPhotoFromDBPhoto = function(dbPhoto) {
+
+        var photo = {};
+
+        photo.dbId = dbPhoto.id;
+        photo.url = $scope.baseUrl + dbPhoto.url;
+        photo.thumbUrl = $scope.baseUrl + dbPhoto.thumbUrl;
+        photo.orientation = dbPhoto.orientation;
+        photo.title = dbPhoto.title;
+
+        var width = dbPhoto.width;
+        var height = dbPhoto.height;
+
+        var ratio;
+        if (photo.orientation == 6) {
+            ratio = height / width;
+        }
+        else {
+            ratio = width / height;
+        }
+
+        photo.height = 108;
+        photo.width = ratio * photo.height;
+
+        var dateTaken = dbPhoto.dateTaken;
+        var dt = new Date(dateTaken);
+        // photo.dateTaken = dt.toString("M/d/yyyy HH:mm");
+        photo.dateTaken = dt.toString("M/d/yyyy hh:mm tt");
+
+        photo.tagList = "";
+        dbPhoto.tags.forEach(function(tag) {
+            photo.tagList += tag + ", ";
+        });
+        photo.tagList = photo.tagList.substring(0, photo.tagList.length - 2);
+
+        photo.dbPhoto = dbPhoto;
+
+        return photo;
+    }
 }]);

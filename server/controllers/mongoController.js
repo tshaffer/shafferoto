@@ -216,7 +216,17 @@ function queryPhotos(querySpecStr) {
 
                 photos = [];
                 photoDocs.forEach(function (photoDoc) {
-                    photos.push({id: photoDoc.id, title: photoDoc.title, url: photoDoc.url, orientation: photoDoc.orientation, width: photoDoc.imageWidth, height: photoDoc.imageHeight, thumbUrl: photoDoc.thumbUrl, tags: photoDoc.tags });
+                    photos.push(
+                        {
+                            id: photoDoc.id,
+                            title: photoDoc.title,
+                            dateTaken: photoDoc.dateTaken,
+                            url: photoDoc.url,
+                            orientation: photoDoc.orientation,
+                            width: photoDoc.imageWidth,
+                            height: photoDoc.imageHeight,
+                            thumbUrl: photoDoc.thumbUrl,
+                            tags: photoDoc.tags });
                 });
 
                 resolve(photos);
