@@ -12,7 +12,7 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
 
     // queries
     $scope.tagsInQuery = [];
-    $scope.tagQueryOperator = "or";
+    $scope.tagQueryOperator = "OR";
     $scope.dateQueryType = "none";
     $scope.dateValue = new Date();
     $scope.startDateValue = new Date();
@@ -183,12 +183,37 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
     };
 
 
+    $scope.searchExpression = "";
+
+    $scope.buildSearchExpression = function() {
+        $scope.searchExpression = "";
+        $scope.tagsInQuery.forEach(function(tag, index) {
+            if (index != 0) {
+                $scope.searchExpression += " " + $scope.tagQueryOperator + " ";
+            }
+            $scope.searchExpression += tag.tag;
+        });
+    }
+
     $scope.addTagToQuery = function() {
-        var tagInQuery = {};
-        tagInQuery.tag = $scope.tags[0];
-        $scope.tagsInQuery.push(tagInQuery);
+
+        if (typeof($scope.addedTag) != 'undefined') {
+            var tagInQuery = {};
+            tagInQuery.tag = $scope.addedTag;
+            $scope.tagsInQuery.push(tagInQuery);
+
+            $scope.buildSearchExpression();
+        }
     };
 
+    $scope.removeTagFromQuery = function() {
+
+    };
+
+    $scope.tagQueryOperatorUpdated = function() {
+        $scope.buildSearchExpression();
+    }
+    
     $scope.deleteTagFromQuery = function(index) {
         $scope.tagsInQuery.splice(index, 1);
     }
