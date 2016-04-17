@@ -1,10 +1,24 @@
 angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServerService', function($scope, $shafferotoServerService ) {
 
+    // photos
     $scope.photos = [];
     $scope.playlistThumbs = [];
     $scope.selectedPhoto = null;
-
     var photosById = {};
+
+    // tags
+    $scope.tags = [];
+    $scope.tagLabel = "";
+
+    // queries
+    $scope.tagsInQuery = [];
+    $scope.tagQueryOperator = "or";
+    $scope.dateQueryType = "none";
+    $scope.dateValue = new Date();
+    $scope.startDateValue = new Date();
+    $scope.endDateValue = new Date();
+    $scope.queries = [];
+    $scope.queryToLoad = null;
 
     // limit height of div that contains the grid of photos
     $scope.photoPageContainerHeight = window.innerHeight - 100;
@@ -66,7 +80,6 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
     })
 
     // retrieve all tags from the db
-    $scope.tags = [];
     var getTagsPromise = $shafferotoServerService.getTags();
     getTagsPromise.then(function (result) {
         console.log("getTags successful");
@@ -76,6 +89,20 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
         $scope.selectedTag = $scope.tags[0];
     });
 
+    // retrieve queries from db
+    var getQueriesPromise = $shafferotoServerService.getQueries();
+    getQueriesPromise.then(function (result) {
+        result.data.forEach(function(query){
+            $scope.queries.push(query);
+        });
+        if ($scope.queries.length > 0) {
+            $scope.queryToLoad = $scope.queries[0];
+        }
+        else {
+            $scope.queryToLoad = null;
+        }
+    });
+    
     $scope.isTagMissingFromPhoto = function(indexOfTag) {
         return indexOfTag < 0;
     }
@@ -188,7 +215,72 @@ angular.module('shafferoto').controller('tagPhotos', ['$scope', 'shafferotoServe
         }
     };
 
-    $scope.tagLabel = "";
+
+    $scope.addTagToQuery = function() {
+        var tagInQuery = {};
+        tagInQuery.tag = $scope.tags[0];
+        $scope.tagsInQuery.push(tagInQuery);
+    };
+
+    $scope.deleteTagFromQuery = function(index) {
+        $scope.tagsInQuery.splice(index, 1);
+    }
+
+    $scope.loadQuery = function() {
+        console.log("load query");
+
+        var getQueryPromise = $shafferotoServerService.getQuery($scope.queryToLoad.name);
+        getQueryPromise.then(function(result) {
+            var querySpec = result.data;
+
+            querySpec.tags.forEach(function(tag) {
+                var tagInQuery = {};
+                tagInQuery.tag = tag;
+                $scope.tagsInQuery.push(tagInQuery);
+            });
+
+            $scope.tagQueryOperator = querySpec.tagQueryOperator;
+
+            $scope.dateQueryType = querySpec.dateQueryType;
+            $scope.dateValue = new Date(querySpec.dateValue);
+            $scope.startDateValue = new Date(querySpec.startDateValue);
+            $scope.endDateValue = new Date(querySpec.endDateValue);
+        });
+    };
+
+    $scope.buildQuerySpec = function() {
+
+        var querySpec = {};
+        querySpec.tagsInQuery = $scope.tagsInQuery;
+        querySpec.tagQueryOperator = $scope.tagQueryOperator;
+
+        querySpec.dateQueryType = $scope.dateQueryType;
+        querySpec.dateValue = $scope.dateValue;
+        querySpec.startDateValue = $scope.startDateValue;
+        querySpec.endDateValue = $scope.endDateValue;
+
+        return querySpec;
+    }
+
+    $scope.saveQuery = function() {
+        console.log("save query");
+
+        var querySpec = $scope.buildQuerySpec();
+        querySpec.name = $scope.savedQueryName;
+
+        var addQueryPromise = $shafferotoServerService.addQuery(querySpec);
+        addQueryPromise.then(function() {
+            console.log("save query successfully completed");
+
+            $scope.queries.push(querySpec);
+            if ($scope.queries.length > 0) {
+                $scope.queryToLoad = $scope.queries[0];
+            }
+            else {
+                $scope.queryToLoad = "";
+            }
+        });
+    };
 
 
 }]);
