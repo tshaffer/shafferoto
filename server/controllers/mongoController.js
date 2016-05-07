@@ -1,4 +1,4 @@
-    var dbOpened = false;
+var dbOpened = false;
 
 var mongoose = require('mongoose');
 require('datejs');
@@ -18,6 +18,12 @@ var photoSchema = new Schema({
     comments: [{ body: String, date: Date }],
 });
 var Photo = mongoose.model('Photo', photoSchema);
+
+var albumSchema = new Schema({
+    name: String,
+    photoIds: [Number]
+});
+var Album = mongoose.model('Album', albumSchema);
 
 var photosQuerySchema = new Schema({
     name:  String,
@@ -409,6 +415,31 @@ function updateTags(photosUpdateSpec) {
     });
 }
 
+function createAlbum(albumName) {
+
+    return new Promise(function (resolve, reject) {
+        var albumForDB = new Album({
+            name: albumName,
+            photoIds: []
+        });
+
+        albumForDB.save(function (err, doc) {
+            if (err) {
+                reject(err);
+            }
+            console.log("album created in db, id=", doc.id);
+            resolve(doc.id);
+        })
+    })
+}
+
+// function addPhotosToAlbum(albumId, photos) {
+//
+//     db.runCommand(
+//
+//     )
+//     Album.findById()
+// }
 
 function handleError(err) {
     console.log("handleError invoked");
@@ -426,5 +457,6 @@ module.exports = {
     queryPhotos: queryPhotos,
     saveQueryToDB: saveQueryToDB,
     getQueries: getQueries,
-    getQuery: getQuery
+    getQuery: getQuery,
+    createAlbum: createAlbum
 }

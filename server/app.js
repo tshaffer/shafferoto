@@ -149,6 +149,25 @@ app.get('/updateTags', function (req, res) {
   res.send("tags updated");
 });
 
+
+app.get('/createAlbum', function (req, res) {
+
+  res.set('Access-Control-Allow-Origin', '*');
+
+  var albumName = req.query.albumName;
+
+  console.log("createAlbum invoked");
+
+  var addAlbumPromise = dbController.createAlbum(albumName);
+  addAlbumPromise.then(function(albumId) {
+    var response = {};
+    response.albumId = albumId;
+    res.send(response);
+  });
+});
+
+
+
 app.get('/updateDB', function(req, res) {
 
   console.log("updateDB invoked");
