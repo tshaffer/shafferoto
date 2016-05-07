@@ -468,22 +468,48 @@ function addPhotosToAlbum(albumId, photoIds) {
     // see updateTags
 
     return new Promise(function(resolve, reject) {
-        Album.findById(albumId, function(err, album) {
+
+        // from stackOverflow
+        // http://stackoverflow.com/questions/11963684/how-to-push-an-array-of-objects-into-an-array-in-mongoose-with-one-call?rq=1
+        // var Kitten = db.model('Kitten', kittySchema);
+        // Kitten.update({name: 'fluffy'},{$pushAll: {values:[2,3]}},{upsert:true},function(err){
+        //     if(err){
+        //         console.log(err);
+        //     }else{
+        //         console.log("Successfully added");
+        //     }
+        // });
+
+        // Kitten.update({name: 'fluffy'}, {$push: {values: {$each: [2,3]}}}, {upsert:true}, function(err){
+        //     if(err){
+        //         console.log(err);
+        //     }else{
+        //         console.log("Successfully added");
+        //     }
+        // });
+
+        Album.update({_id: albumId}, {$push: {photoIds: {$each: photoIds}}}, {upsert:true}, function (err) {
             if (err) reject(err);
+            resolve();
+        });
 
-            var allPhotoIds = [];
-            album.photoIds.forEach(function(element, index, array) {
-                allPhotoIds.push(element);
-            });
-            photoIds.forEach(function(element, index, array) {
-                allPhotoIds.push(element);
-            });
+        // Album.findById(albumId, function(err, album) {
+        //     if (err) reject(err);
 
-            Album.update({_id: albumId}, {$set: {photoIds: allPhotoIds}}, function(err) {
-                if (err) reject(err);
-                resolve();
-            });
-        })
+            // var allPhotoIds = [];
+            // album.photoIds.forEach(function(element, index, array) {
+            //     allPhotoIds.push(element);
+            // });
+            // photoIds.forEach(function(element, index, array) {
+            //     allPhotoIds.push(element);
+            // });
+            // Album.update({_id: albumId}, {$set: {photoIds: allPhotoIds}}, function(err) {
+            //     if (err) reject(err);
+            //     resolve();
+            // });
+
+
+        // });
     })
 }
 
