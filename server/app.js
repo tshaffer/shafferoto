@@ -150,6 +150,20 @@ app.get('/updateTags', function (req, res) {
 });
 
 
+app.get('/getAlbums', function(req, res) {
+
+  console.log("getAlbums invoked");
+  res.set('Access-Control-Allow-Origin', '*');
+
+  var fetchAllAlbumsPromise = dbController.fetchAllAlbums();
+  fetchAllAlbumsPromise.then(function(allAlbums) {
+    var response = {};
+    response.Albums = allAlbums;
+    res.send(response);
+  });
+});
+
+
 app.get('/createAlbum', function (req, res) {
 
   res.set('Access-Control-Allow-Origin', '*');
@@ -167,18 +181,19 @@ app.get('/createAlbum', function (req, res) {
 });
 
 
-app.get('/getAlbums', function(req, res) {
+app.get('/addPhotosToAlbum', function (req, res) {
 
-  console.log("getAlbums invoked");
   res.set('Access-Control-Allow-Origin', '*');
 
-  var fetchAllAlbumsPromise = dbController.fetchAllAlbums();
-  fetchAllAlbumsPromise.then(function(allAlbums) {
-    var response = {};
-    response.Albums = allAlbums;
-    res.send(response);
-  });
+  var albumId = req.query.albumId;
+  var idsOfPhotosToAdd = req.query.photos;
+
+  var addPhotosToAlbumPromise = dbController.addPhotosToAlbum(albumId, idsOfPhotosToAdd);
+  addPhotosToAlbumPromise.then(function() {
+    res.send("ok");
+  })
 });
+
 
 
 

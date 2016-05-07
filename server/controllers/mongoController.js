@@ -21,7 +21,7 @@ var Photo = mongoose.model('Photo', photoSchema);
 
 var albumSchema = new Schema({
     name: String,
-    photoIds: [Number]
+    photoIds: [String]
 });
 var Album = mongoose.model('Album', albumSchema);
 
@@ -430,7 +430,7 @@ function fetchAllAlbums() {
                 }
 
                 dbAlbums.forEach(function (albumDoc) {
-                    albums.push({name: albumDoc.name});
+                    albums.push({ name: albumDoc.name, id: albumDoc.id });
                 });
 
                 resolve(albums);
@@ -462,13 +462,35 @@ function createAlbum(albumName) {
     })
 }
 
-// function addPhotosToAlbum(albumId, photos) {
-//
-//     db.runCommand(
-//
-//     )
-//     Album.findById()
-// }
+function addPhotosToAlbum(albumId, photoIds) {
+
+    // return new Promise(function(resolve, reject) {
+    //     Album.findByIdAndUpdate(
+    //         albumId,
+    //         // {$push: {"photoIds": {title: title, msg: msg}}},
+    //         { $push: {"photoIds": photoIds[0] }},
+    //         { safe: true, upsert: true},
+    //         function(err, model) {
+    //             if (err) reject(err);
+    //             resolve();
+    //         }
+    //     );
+    // });
+
+    return new Promise(function(resolve, reject) {
+        Album.findByIdAndUpdate(
+            albumId,
+            // {$push: {"photoIds": {title: title, msg: msg}}},
+            { $push: {"photoIds": photoIds }},
+            { safe: true, upsert: true},
+            function(err, model) {
+                if (err) reject(err);
+                resolve();
+            }
+        );
+    });
+
+}
 
 function handleError(err) {
     console.log("handleError invoked");
@@ -487,6 +509,7 @@ module.exports = {
     saveQueryToDB: saveQueryToDB,
     getQueries: getQueries,
     getQuery: getQuery,
+    fetchAllAlbums: fetchAllAlbums,
     createAlbum: createAlbum,
-    fetchAllAlbums: fetchAllAlbums
+    addPhotosToAlbum: addPhotosToAlbum
 }
