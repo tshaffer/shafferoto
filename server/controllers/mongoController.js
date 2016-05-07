@@ -466,11 +466,24 @@ function addPhotosToAlbum(albumId, photoIds) {
 
     // need to get photoIds for the current album and append them
     // see updateTags
+
     return new Promise(function(resolve, reject) {
-        Album.update({_id: albumId}, {$set: {photoIds: photoIds}}, function(err) {
+        Album.findById(albumId, function(err, album) {
             if (err) reject(err);
-            resolve();
-        });
+
+            var allPhotoIds = [];
+            album.photoIds.forEach(function(element, index, array) {
+                allPhotoIds.push(element);
+            });
+            photoIds.forEach(function(element, index, array) {
+                allPhotoIds.push(element);
+            });
+
+            Album.update({_id: albumId}, {$set: {photoIds: allPhotoIds}}, function(err) {
+                if (err) reject(err);
+                resolve();
+            });
+        })
     })
 }
 
