@@ -23,6 +23,17 @@ app.get('/', function(req, res) {
 });
 
 app.use('/photos', express.static(path.join(__dirname,'/public')));
+app.use('/index.html', express.static(path.join(__dirname,'../../bang/bangaract/index.html')));
+
+// app.get('/index.html', function(req, res) {
+//   debugger;
+//   // var baseDirName = __dirname;
+//   var filePath = path.join(__dirname,'../../bang/bangaract/index.html');
+//   fs.readFile(filePath, function (err, data) {
+//      console.log("File read complete");
+//   });
+//
+// })
 
 app.get('/getPhotos', function(req, res) {
 
