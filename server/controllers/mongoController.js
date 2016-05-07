@@ -464,32 +464,14 @@ function createAlbum(albumName) {
 
 function addPhotosToAlbum(albumId, photoIds) {
 
-    // return new Promise(function(resolve, reject) {
-    //     Album.findByIdAndUpdate(
-    //         albumId,
-    //         // {$push: {"photoIds": {title: title, msg: msg}}},
-    //         { $push: {"photoIds": photoIds[0] }},
-    //         { safe: true, upsert: true},
-    //         function(err, model) {
-    //             if (err) reject(err);
-    //             resolve();
-    //         }
-    //     );
-    // });
-
+    // need to get photoIds for the current album and append them
+    // see updateTags
     return new Promise(function(resolve, reject) {
-        Album.findByIdAndUpdate(
-            albumId,
-            // {$push: {"photoIds": {title: title, msg: msg}}},
-            { $push: {"photoIds": photoIds }},
-            { safe: true, upsert: true},
-            function(err, model) {
-                if (err) reject(err);
-                resolve();
-            }
-        );
-    });
-
+        Album.update({_id: albumId}, {$set: {photoIds: photoIds}}, function(err) {
+            if (err) reject(err);
+            resolve();
+        });
+    })
 }
 
 function handleError(err) {
