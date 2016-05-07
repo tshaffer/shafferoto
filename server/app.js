@@ -167,6 +167,20 @@ app.get('/createAlbum', function (req, res) {
 });
 
 
+app.get('/getAlbums', function(req, res) {
+
+  console.log("getAlbums invoked");
+  res.set('Access-Control-Allow-Origin', '*');
+
+  var fetchAllAlbumsPromise = dbController.fetchAllAlbums();
+  fetchAllAlbumsPromise.then(function(allAlbums) {
+    var response = {};
+    response.Albums = allAlbums;
+    res.send(response);
+  });
+});
+
+
 
 app.get('/updateDB', function(req, res) {
 

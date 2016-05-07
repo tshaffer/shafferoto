@@ -415,6 +415,35 @@ function updateTags(photosUpdateSpec) {
     });
 }
 
+function fetchAllAlbums() {
+
+    return new Promise(function (resolve, reject) {
+
+        if (dbOpened) {
+
+            var albums = [];
+
+            Album.find({}, function (err, dbAlbums) {
+                if (err) {
+                    console.log("error returned from mongoose query");
+                    reject();
+                }
+
+                dbAlbums.forEach(function (albumDoc) {
+                    albums.push({name: albumDoc.name});
+                });
+
+                resolve(albums);
+            });
+        }
+        else {
+            reject();
+        }
+    });
+};
+
+
+
 function createAlbum(albumName) {
 
     return new Promise(function (resolve, reject) {
@@ -458,5 +487,6 @@ module.exports = {
     saveQueryToDB: saveQueryToDB,
     getQueries: getQueries,
     getQuery: getQuery,
-    createAlbum: createAlbum
+    createAlbum: createAlbum,
+    fetchAllAlbums: fetchAllAlbums
 }
