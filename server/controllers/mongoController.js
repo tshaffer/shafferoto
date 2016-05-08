@@ -457,7 +457,7 @@ function createAlbum(albumName) {
                 reject(err);
             }
             console.log("album created in db, id=", doc.id);
-            resolve(doc.id);
+            resolve(doc);
         })
     })
 }

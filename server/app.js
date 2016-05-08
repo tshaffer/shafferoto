@@ -173,9 +173,9 @@ app.get('/createAlbum', function (req, res) {
   console.log("createAlbum invoked");
 
   var addAlbumPromise = dbController.createAlbum(albumName);
-  addAlbumPromise.then(function(albumId) {
+  addAlbumPromise.then(function(album) {
     var response = {};
-    response.albumId = albumId;
+    response.album = album;
     res.send(response);
   });
 });
