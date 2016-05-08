@@ -195,6 +195,24 @@ app.get('/addPhotosToAlbum', function (req, res) {
 });
 
 
+app.get('/getPhotosInAlbum', function(req, res) {
+
+  res.set('Access-Control-Allow-Origin', '*');
+
+  var albumId = req.query.albumId;
+
+  console.log("getPhotosInAlbum invoked");
+
+  var getPhotosInAlbumPromise = dbController.getPhotosInAlbum(albumId);
+  getPhotosInAlbumPromise.then(function(photos) {
+    var response = {};
+    response.photos = photos;
+    res.send(response);
+  });
+});
+
+
+
 
 
 app.get('/updateDB', function(req, res) {

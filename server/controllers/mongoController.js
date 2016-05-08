@@ -480,6 +480,8 @@ function addPhotosToAlbum(albumId, photoIds) {
         //     }
         // });
 
+        // NB: you may also want to look at $addToSet, which can be used to only add values to an array if they aren't there already. – Stennie Aug 15 '12 at 3:39
+
         // Kitten.update({name: 'fluffy'}, {$push: {values: {$each: [2,3]}}}, {upsert:true}, function(err){
         //     if(err){
         //         console.log(err);
@@ -492,25 +494,58 @@ function addPhotosToAlbum(albumId, photoIds) {
             if (err) reject(err);
             resolve();
         });
-
-        // Album.findById(albumId, function(err, album) {
-        //     if (err) reject(err);
-
-            // var allPhotoIds = [];
-            // album.photoIds.forEach(function(element, index, array) {
-            //     allPhotoIds.push(element);
-            // });
-            // photoIds.forEach(function(element, index, array) {
-            //     allPhotoIds.push(element);
-            // });
-            // Album.update({_id: albumId}, {$set: {photoIds: allPhotoIds}}, function(err) {
-            //     if (err) reject(err);
-            //     resolve();
-            // });
-
-
-        // });
     })
+}
+
+function getPhotosInAlbum(albumId) {
+
+    // https://docs.mongodb.com/master/reference/operator/aggregation/lookup/#pipe._S_lookup
+
+    // http://stackoverflow.com/questions/34967482/lookup-on-objectids-in-an-array
+
+    // aggregate.lookup({ from: 'users', localField: 'userId', foreignField: '_id', as: 'users' });
+
+    return new Promise(function (resolve, reject) {
+
+        if (dbOpened) {
+
+            var photos = [];
+
+            // initial implementation does not use join
+            // get the photo id's in an album
+            Album.findById(albumId, function (err, album) {
+                if (err) reject();
+
+                var photosToRetrieve = album.photoIds.length;
+                var photosRetrieved = 0;
+
+                album.photoIds.forEach(function(photoId, index, array) {
+                    console.log("Album contains photo with id:", photoId);
+                    Photo.findById(photoId, function(err, photo) {
+                        if (err) reject();
+                        photos.push({
+                            id: photo.id,
+                            title: photo.title,
+                            dateTaken: photo.dateTaken,
+                            url: photo.url,
+                            orientation: photo.orientation,
+                            width: photo.imageWidth,
+                            height: photo.imageHeight,
+                            thumbUrl: photo.thumbUrl,
+                            tags: photo.tags });
+
+                        photosRetrieved++;
+                        if (photosToRetrieve == photosRetrieved) {
+                            resolve(photos);
+                        }
+                    });
+                });
+            });
+        }
+        else {
+            reject();
+        }
+    });
 }
 
 function handleError(err) {
@@ -532,5 +567,6 @@ module.exports = {
     getQuery: getQuery,
     fetchAllAlbums: fetchAllAlbums,
     createAlbum: createAlbum,
-    addPhotosToAlbum: addPhotosToAlbum
+    addPhotosToAlbum: addPhotosToAlbum,
+    getPhotosInAlbum: getPhotosInAlbum
 }
