@@ -355,7 +355,8 @@ function fetchAllTags() {
                 }
 
                 dbTags.forEach(function (tagDoc) {
-                    tags.push({label: tagDoc.label});
+                    // tags.push({label: tagDoc.label});
+                    tags.push({id: tagDoc.id, name: tagDoc.label})
                 });
 
                 resolve(tags);

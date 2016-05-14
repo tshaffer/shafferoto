@@ -174,9 +174,13 @@ app.get('/createAlbum', function (req, res) {
 
   var addAlbumPromise = dbController.createAlbum(albumName);
   addAlbumPromise.then(function(album) {
-    var response = {};
-    response.album = album;
-    res.send(response);
+    // return all the albums
+    var fetchAllAlbumsPromise = dbController.fetchAllAlbums();
+    fetchAllAlbumsPromise.then(function(allAlbums) {
+      var response = {};
+      response.Albums = allAlbums;
+      res.send(response);
+    });
   });
 });
 
