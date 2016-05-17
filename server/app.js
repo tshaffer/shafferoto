@@ -22,8 +22,15 @@ app.get('/', function(req, res) {
   res.send('<html><head></head><body><h1>Hello shafferoto!</h1></body></html>');
 });
 
-app.use('/photos', express.static(path.join(__dirname,'/public')));
+// app.use('/photos', express.static(path.join(__dirname,'/public')));
 app.use('/index.html', express.static(path.join(__dirname,'../../bang/bangaract/index.html')));
+
+// "/Users/tedshaffer/Documents/Projects/shafferoto/server" __dirname
+// var testDir = path.join(__dirname, '../../../../Pictures/SanMateoCoast2013');
+
+// var testDir = '/Users/tedshaffer/Pictures/SanMateoCoast2013';
+// // app.use('/photos', express.static(testDir));   // works
+// app.use(express.static(testDir));                 // also works
 
 // app.get('/index.html', function(req, res) {
 //   debugger;
@@ -216,8 +223,48 @@ app.get('/getPhotosInAlbum', function(req, res) {
 });
 
 
+app.get('/addFolder', function (req, res) {
 
+  res.set('Access-Control-Allow-Origin', '*');
 
+  var folderName = req.query.folderName[0];
+  var basename = path.basename(folderName);
+  var dirname = path.dirname(folderName);
+
+  console.log("addFolder invoked: ", folderName);
+
+  var photosInFolder = [];
+  photosOnDrive = findPhotos(folderName, photosInFolder, basename);
+
+  if (photosOnDrive.length > 0) {
+
+    app.use(express.static(dirname));
+
+    // temporarily comment this out - look for photosOnDrive that aren't in photosInDB
+    var photosToAdd = [];
+    photosOnDrive.forEach(function (photoOnDrive) {
+      // if ( !photosInDB.hasOwnProperty( photoOnDrive.url ) ) {
+        photosToAdd.push(photoOnDrive);
+      // }
+    });
+
+    if (photosToAdd.length > 0) {
+      var getExifDataPromise = exifReader.getAllExifData(photosToAdd);
+      getExifDataPromise.then(function(photos) {
+        console.log("getExifDataPromised resolved");
+
+        var buildThumbnailsPromise = buildThumbnails(photos);
+        buildThumbnailsPromise.then(function(obj) {
+          console.log("thumbnails build complete");
+          dbController.savePhotosToDB(photos);
+        });
+      });
+    }
+  }
+
+  res.send("ok");
+
+})
 
 app.get('/updateDB', function(req, res) {
 
@@ -230,7 +277,7 @@ app.get('/updateDB', function(req, res) {
 
     console.log('Look for photos in ' + photosDir);
     var photosOnDrive = [];
-    photosOnDrive = findPhotos(photosDir, photosOnDrive);
+    photosOnDrive = findPhotos(photosDir, photosOnDrive, "");
 
     if (photosOnDrive.length > 0) {
 
@@ -330,13 +377,13 @@ console.log("launch shafferoto");
 
 var photoFileSuffixes = ['jpg'];
 
-function findPhotos(dir, photoFiles) {
+function findPhotos(dir, photoFiles, basename) {
   var files = fs.readdirSync(dir);
   photoFiles = photoFiles || [];
 
   files.forEach(function(file) {
     if (fs.statSync(dir + '/' + file).isDirectory()) {
-      photoFiles = findPhotos(dir + '/' + file, photoFiles);
+      photoFiles = findPhotos(dir + '/' + file, photoFiles, basename);
     }
     else {
       // save it if it's a photo file but not if it's a thumbnail
@@ -347,6 +394,9 @@ function findPhotos(dir, photoFiles) {
             var photo = {};
             photo.title = file;
 
+            // photo.url = path.relative(photosDir, filePath);
+            photo.url = path.join(basename, file);
+
             var filePath = path.format({
               root: "/",
               dir: dir,
@@ -354,8 +404,8 @@ function findPhotos(dir, photoFiles) {
               ext: "." + suffix,
               name: "file"
             });
-            photo.url = path.relative(photosDir, filePath);
             photo.filePath = filePath;
+
             photo.dateTaken = Date.now();
             photo.orientation = 1;
 

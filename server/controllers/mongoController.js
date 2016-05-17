@@ -8,6 +8,7 @@ var photos = [];
 var Schema = mongoose.Schema;
 var photoSchema = new Schema({
     title:  String,
+    path: String,
     url: String,
     dateTaken: Date,
     orientation: Number,
@@ -279,6 +280,7 @@ function savePhotosToDB(photos) {
 
         var photoForDB = new Photo({
             title: photo.title,
+            path: photo.filePath,
             url: photo.url,
             tags: [],
             dateTaken: photo.dateTaken,
