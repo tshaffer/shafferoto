@@ -22,15 +22,8 @@ app.get('/', function(req, res) {
   res.send('<html><head></head><body><h1>Hello shafferoto!</h1></body></html>');
 });
 
-// app.use('/photos', express.static(path.join(__dirname,'/public')));
+app.use('/photos', express.static(path.join(__dirname,'/public')));
 app.use('/index.html', express.static(path.join(__dirname,'../../bang/bangaract/index.html')));
-
-// "/Users/tedshaffer/Documents/Projects/shafferoto/server" __dirname
-// var testDir = path.join(__dirname, '../../../../Pictures/SanMateoCoast2013');
-
-// var testDir = '/Users/tedshaffer/Pictures/SanMateoCoast2013';
-// // app.use('/photos', express.static(testDir));   // works
-// app.use(express.static(testDir));                 // also works
 
 // app.get('/index.html', function(req, res) {
 //   debugger;
@@ -240,7 +233,8 @@ app.get('/addFolder', function (req, res) {
 
     app.use(express.static(dirname));
 
-    // temporarily comment this out - look for photosOnDrive that aren't in photosInDB
+    // temporarily comment out the code that only looks for new files
+    // look for photosOnDrive that aren't in photosInDB
     var photosToAdd = [];
     photosOnDrive.forEach(function (photoOnDrive) {
       // if ( !photosInDB.hasOwnProperty( photoOnDrive.url ) ) {
@@ -253,7 +247,7 @@ app.get('/addFolder', function (req, res) {
       getExifDataPromise.then(function(photos) {
         console.log("getExifDataPromised resolved");
 
-        var buildThumbnailsPromise = buildThumbnails(photos);
+        var buildThumbnailsPromise = buildThumbnails(photos, basename);
         buildThumbnailsPromise.then(function(obj) {
           console.log("thumbnails build complete");
           dbController.savePhotosToDB(photos);
@@ -294,7 +288,7 @@ app.get('/updateDB', function(req, res) {
         getExifDataPromise.then(function(photos) {
           console.log("getExifDataPromised resolved");
 
-          var buildThumbnailsPromise = buildThumbnails(photos);
+          var buildThumbnailsPromise = buildThumbnails(photos, "");
           buildThumbnailsPromise.then(function(obj) {
             console.log("thumbnails build complete");
             dbController.savePhotosToDB(photos);
@@ -308,7 +302,7 @@ app.get('/updateDB', function(req, res) {
 });
 
 
-function buildThumbnails(photos) {
+function buildThumbnails(photos, basename) {
 
   var photoCount = photos.length;
 
@@ -319,7 +313,7 @@ function buildThumbnails(photos) {
     photos.forEach(function(photo) {
       // Add these actions to the end of the sequence
       sequence = sequence.then(function() {
-        return buildThumb(photo);
+        return buildThumb(photo, basename);
       }).then(function(photo) {
         photoCount--;
         console.log("photoCount=" + photoCount);
@@ -332,7 +326,7 @@ function buildThumbnails(photos) {
 }
 
 
-function buildThumb(photo) {
+function buildThumb(photo, basename) {
 
   return new Promise(function(resolve, reject) {
 
@@ -347,7 +341,8 @@ function buildThumb(photo) {
     var thumbPathName = path.join(dirName,thumbFileName);
 
     // photo is the object that is stored in the db
-    photo.thumbUrl = path.relative(photosDir, thumbPathName);
+    // photo.thumbUrl = path.relative(photosDir, thumbPathName);
+    photo.thumbUrl = path.join(basename, thumbFileName);
 
     var createThumbPromise = easyImage.resize({
       src: photo.filePath,
