@@ -8,7 +8,7 @@ var sha1 = require('sha1');
 var easyImage = require("easyimage");
 
 var dbController = require('./controllers/mongoController');
-dbController.initialize();
+var openDBPromise = dbController.initialize();
 
 var exifReader = require('./controllers/nodeExif.js');
 
@@ -34,6 +34,16 @@ app.use('/index.html', express.static(path.join(__dirname,'../../bang/bangaract/
 //   });
 //
 // })
+
+openDBPromise.then(function() {
+  var fetchPhotoFoldersPromise = dbController.fetchPhotoFolders();
+  fetchPhotoFoldersPromise.then(function(photoFolders) {
+    photoFolders.forEach(function(photoFolder, index, array) {
+      app.use(express.static(photoFolder.dirname));
+    });
+  });
+});
+
 
 app.get('/getPhotos', function(req, res) {
 
@@ -220,18 +230,18 @@ app.get('/addFolder', function (req, res) {
 
   res.set('Access-Control-Allow-Origin', '*');
 
-  var folderName = req.query.folderName[0];
-  var basename = path.basename(folderName);
-  var dirname = path.dirname(folderName);
+  var folder = req.query.folderName[0];
+  var baseName = path.basename(folder);
+  var dirName = path.dirname(folder);
 
-  console.log("addFolder invoked: ", folderName);
+  console.log("addFolder invoked: ", folder);
 
   var photosInFolder = [];
-  photosOnDrive = findPhotos(folderName, photosInFolder, basename);
+  photosOnDrive = findPhotos(folder, photosInFolder, baseName);
 
   if (photosOnDrive.length > 0) {
 
-    app.use(express.static(dirname));
+    app.use(express.static(dirName));
 
     // temporarily comment out the code that only looks for new files
     // look for photosOnDrive that aren't in photosInDB
@@ -247,7 +257,7 @@ app.get('/addFolder', function (req, res) {
       getExifDataPromise.then(function(photos) {
         console.log("getExifDataPromised resolved");
 
-        var buildThumbnailsPromise = buildThumbnails(photos, basename);
+        var buildThumbnailsPromise = buildThumbnails(photos, baseName);
         buildThumbnailsPromise.then(function(obj) {
           console.log("thumbnails build complete");
           dbController.savePhotosToDB(photos);
@@ -255,6 +265,8 @@ app.get('/addFolder', function (req, res) {
       });
     }
   }
+
+  dbController.addFolder(folder, baseName, dirName);
 
   res.send("ok");
 

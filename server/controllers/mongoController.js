@@ -20,6 +20,13 @@ var photoSchema = new Schema({
 });
 var Photo = mongoose.model('Photo', photoSchema);
 
+var photoFolderSchema = new Schema({
+    path: String,
+    baseName: String,
+    dirName: String
+});
+var PhotoFolder = mongoose.model('PhotoFolder', photoFolderSchema);
+
 var albumSchema = new Schema({
     name: String,
     photoIds: [String]
@@ -45,14 +52,23 @@ var Tag = mongoose.model('Tag', tagSchema);
 
 function initialize() {
 
-    mongoose.connect('mongodb://localhost/shafferotoTest');
+    return new Promise(function (resolve, reject) {
 
-    var db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'connection error:'));
-    db.once('open', function() {
-        console.log("connected to shafferotoTest");
-        dbOpened = true;
+        mongoose.connect('mongodb://localhost/shafferotoTest');
+
+        var db = mongoose.connection;
+        // db.on('error', console.error.bind(console, 'connection error:'));
+        db.on('error', function() {
+            reject();
+        })
+        db.once('open', function() {
+            console.log("connected to shafferotoTest");
+            dbOpened = true;
+            resolve();
+        });
+        
     });
+    
 }
 
 
@@ -551,6 +567,58 @@ function getPhotosInAlbum(albumId) {
     });
 }
 
+function addFolder(path, baseName, dirName) {
+
+    return new Promise(function (resolve, reject) {
+
+        var folderForDB = new PhotoFolder({
+            path: path,
+            baseName: baseName,
+            dirName: dirName
+        });
+
+        folderForDB.save(function (err) {
+            if (err) {
+                reject(err);
+            }
+            console.log("photo folder saved in db");
+            resolve();
+        });
+    });
+
+}
+
+function fetchPhotoFolders() {
+
+    return new Promise(function (resolve, reject) {
+
+        if (dbOpened) {
+
+            var photoFolders = [];
+
+            PhotoFolder.find({}, function (err, dbPhotoFolders) {
+                if (err) {
+                    console.log("error returned from mongoose query");
+                    reject();
+                }
+
+                dbPhotoFolders.forEach(function (photoFolderDoc) {
+                    photoFolders.push({
+                        path: photoFolderDoc.path,
+                        baseName: photoFolderDoc.baseName,
+                        dirName: photoFolderDoc.dirName
+                    })
+                });
+
+                resolve(photoFolders);
+            });
+        }
+        else {
+            reject();
+        }
+    });
+}
+
 function handleError(err) {
     console.log("handleError invoked");
     return;
@@ -571,5 +639,7 @@ module.exports = {
     fetchAllAlbums: fetchAllAlbums,
     createAlbum: createAlbum,
     addPhotosToAlbum: addPhotosToAlbum,
-    getPhotosInAlbum: getPhotosInAlbum
+    getPhotosInAlbum: getPhotosInAlbum,
+    addFolder: addFolder,
+    fetchPhotoFolders: fetchPhotoFolders
 }
