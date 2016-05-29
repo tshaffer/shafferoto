@@ -39,39 +39,10 @@ openDBPromise.then(function() {
   var fetchPhotoFoldersPromise = dbController.fetchPhotoFolders();
   fetchPhotoFoldersPromise.then(function(photoFolders) {
     photoFolders.forEach(function(photoFolder, index, array) {
-      // app.use(express.static(photoFolder.dirname));
       app.use(express.static(photoFolder.dirName));
-      // app.use(express.static(photoFolder.baseName));
     });
   });
 });
-
-// openDBPromise.then(function() {
-//   var fetchPhotoFoldersPromise = dbController.fetchPhotoFolders();
-//   fetchPhotoFoldersPromise.then(function(photoFolders) {
-//     photoFolders.forEach(function(photoFolder, index, array) {
-//       // app.use("file:///" + photoFolder.baseName, express.static(photoFolder.baseName));
-//       // app.use("file:///" + photoFolder.baseName, express.static(photoFolder.baseName, {
-//       //   setHeaders: function(res, filePath) {
-//       //     debugger;
-//       //   }
-//       // }));
-//       // app.use("file:///" + photoFolder.baseName, function(req, res) {
-//       //   debugger;
-//       // })
-//       // app.use("/SanMateoCoast2013/IMG_7093_thumb.JPG", function(req, res) {
-//       //   debugger;
-//       // });
-//       //
-//       // app.use("/", function(req, res) {
-//       //   console.log("eat pizza");
-//       // });
-//
-//
-//     });
-//   });
-// });
-
 
 app.get('/getPhotos', function(req, res) {
 
