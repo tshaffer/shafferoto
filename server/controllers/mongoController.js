@@ -50,13 +50,15 @@ var tagSchema = new Schema ({
 });
 var Tag = mongoose.model('Tag', tagSchema);
 
+var db = null;
+
 function initialize() {
 
     return new Promise(function (resolve, reject) {
 
         mongoose.connect('mongodb://localhost/shafferotoTest');
 
-        var db = mongoose.connection;
+        db = mongoose.connection;
         // db.on('error', console.error.bind(console, 'connection error:'));
         db.on('error', function() {
             reject();
@@ -78,7 +80,49 @@ function fetchAllPhotos() {
 
         if (dbOpened) {
 
-            Photo.find({}, function (err, photoDocs) {
+            // var cursor =db.collection('restaurants').find( );
+            // cursor.each(function(err, doc) {
+            //     assert.equal(err, null);
+            //     if (doc != null) {
+            //         console.dir(doc);
+            //     } else {
+            //         callback();
+            //     }
+            // });
+
+
+            // https://docs.mongodb.com/getting-started/node/query/
+            // https://docs.mongodb.com/manual/reference/method/cursor.sort/#cursor.sort
+
+            photos = [];
+
+            // var cursor = db.collection('photos').find({}).sort({dateTaken: -1});
+            // cursor.each(function(err, photoDoc) {
+            //     if (err) {
+            //         console.log("error returned from mongoose query");
+            //         reject();
+            //     }
+            //     if (photoDoc != null) {
+            //         photos.push(
+            //             {
+            //                 id: photoDoc.id,
+            //                 title: photoDoc.title,
+            //                 dateTaken: photoDoc.dateTaken,
+            //                 url: photoDoc.url,
+            //                 orientation: photoDoc.orientation,
+            //                 width: photoDoc.imageWidth,
+            //                 height: photoDoc.imageHeight,
+            //                 thumbUrl: photoDoc.thumbUrl,
+            //                 tags: photoDoc.tags });
+            //     }
+            //     else {
+            //         resolve(photos);
+            //     }
+            // });
+
+            // passing options and executing immediately
+            // MyModel.find({ name: /john/i }, null, { skip: 10 }, function (err, docs) {});
+            Photo.find({}, null, { sort: {dateTaken: -1} }, function (err, photoDocs) {
                 if (err) {
                     console.log("error returned from mongoose query");
                     reject();
@@ -101,6 +145,33 @@ function fetchAllPhotos() {
 
                 resolve(photos);
             });
+
+            //     myCollection.find().sort({date: 1}).limit(50, callback);
+
+            // original implementation without sort
+            // Photo.find({}, function (err, photoDocs) {
+            //     if (err) {
+            //         console.log("error returned from mongoose query");
+            //         reject();
+            //     }
+            //
+            //     photos = [];
+            //     photoDocs.forEach(function (photoDoc) {
+            //         photos.push(
+            //             {
+            //                 id: photoDoc.id,
+            //                 title: photoDoc.title,
+            //                 dateTaken: photoDoc.dateTaken,
+            //                 url: photoDoc.url,
+            //                 orientation: photoDoc.orientation,
+            //                 width: photoDoc.imageWidth,
+            //                 height: photoDoc.imageHeight,
+            //                 thumbUrl: photoDoc.thumbUrl,
+            //                 tags: photoDoc.tags });
+            //     });
+            //
+            //     resolve(photos);
+            // });
         }
         else {
             reject();
