@@ -50,15 +50,13 @@ var tagSchema = new Schema ({
 });
 var Tag = mongoose.model('Tag', tagSchema);
 
-var db = null;
-
 function initialize() {
 
     return new Promise(function (resolve, reject) {
 
         mongoose.connect('mongodb://localhost/shafferotoTest');
 
-        db = mongoose.connection;
+        var db = mongoose.connection;
         // db.on('error', console.error.bind(console, 'connection error:'));
         db.on('error', function() {
             reject();
@@ -363,26 +361,31 @@ function hashAllPhotos() {
 
 function savePhotosToDB(photos) {
 
-    photos.forEach(function(photo) {
+    return new Promise(function (resolve, reject) {
+        
+        photos.forEach(function(photo) {
 
-        var photoForDB = new Photo({
-            title: photo.title,
-            path: photo.filePath,
-            url: photo.url,
-            tags: [],
-            dateTaken: photo.dateTaken,
-            orientation: photo.orientation,
-            imageWidth: photo.imageWidth,
-            imageHeight: photo.imageHeight,
-            thumbUrl: photo.thumbUrl
+            var photoForDB = new Photo({
+                title: photo.title,
+                path: photo.filePath,
+                url: photo.url,
+                tags: [],
+                dateTaken: photo.dateTaken,
+                orientation: photo.orientation,
+                imageWidth: photo.imageWidth,
+                imageHeight: photo.imageHeight,
+                thumbUrl: photo.thumbUrl
+            });
+
+            photoForDB.save(function (err) {
+                if (err) return handleError(err);
+            });
         });
 
-        photoForDB.save(function (err) {
-            if (err) return handleError(err);
-        });
-    });
+        console.log("all photos submitted to save engine");
 
-    console.log("all photos submitted to save engine");
+        resolve();
+    })
 }
 
 

@@ -259,16 +259,22 @@ app.get('/addFolder', function (req, res) {
         var buildThumbnailsPromise = buildThumbnails(photos, baseName);
         buildThumbnailsPromise.then(function(obj) {
           console.log("thumbnails build complete");
-          dbController.savePhotosToDB(photos);
+          var savePhotosPromise = dbController.savePhotosToDB(photos);
+          savePhotosPromise.then(function() {
+            var addFolderPromise = dbController.addFolder(folder, baseName, dirName);
+            addFolderPromise.then(function() {
+              var fetchAllPhotosPromise = dbController.fetchAllPhotos();
+              fetchAllPhotosPromise.then(function(allPhotos) {
+                var response = {};
+                response.photos = allPhotos;
+                res.send(response);
+              });
+            });
+          });
         });
       });
     }
   }
-
-  dbController.addFolder(folder, baseName, dirName);
-
-  res.send("ok");
-
 })
 
 app.get('/updateDB', function(req, res) {
